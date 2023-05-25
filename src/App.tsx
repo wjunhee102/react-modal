@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { modalController } from './modal';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         >
           Learn React
         </a>
+        <button onClick={() => modalController.open("modal1")}>모달 열기</button>
       </header>
     </div>
   );
