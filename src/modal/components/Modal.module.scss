@@ -1,0 +1,172 @@
+
+.modalDispatcher {
+  display: block;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10001;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+
+  pointer-events: none;
+
+  .modalClearBtn {
+    all: unset;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: transparent;
+  }
+
+  &.open {
+    .modalClearBtn {
+      pointer-events: auto;
+      cursor: pointer;
+    }
+  }
+}
+
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  .closeModalCover {
+    all: unset;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+    background: transparent;
+    cursor: pointer;
+
+    &.close {
+      opacity: 0 !important;
+      cursor: default;
+    }
+  }
+
+  .modalContentContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: none;
+  }
+}
+
+.modalContent {
+  display: block;
+  position: absolute;
+  width: auto;
+  height: auto;
+  opacity: 0;
+
+  &.open {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  &.center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+
+    &.open {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  &.bottom {
+    left: 50%;
+    bottom: 0px;
+    transform:  translate(-50%, 100%);
+
+    &.open {
+      transform: translate(-50%, 0);
+    }
+  }
+
+  &.top {
+    left: 50%;
+    top: 0px;
+    transform:  translate(-50%, -100%);
+  
+    &.open {
+      transform: translate(-50%, 0);
+    }
+  }
+
+  &.left {
+    left: 0px;
+    top: 50%;
+    transform:  translate(-100%, -50%);
+  
+    &.open {
+      transform: translate(0, -50%);
+    }
+  }
+
+  &.right {
+    right: 0px;
+    top: 50%;
+    transform:  translate(100%, -50%);
+  
+    &.open {
+      transform:  translate(0, -50%);
+    }
+  }
+
+  &.withTarget {
+    &.center {
+      transform: translate(-50%, -50%) scale(0);
+  
+      &.open {
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+  
+    &.bottom {
+      transform:  translate(-50%, 100%);
+  
+      &.open {
+        transform: translate(-50%, 0);
+      }
+    }
+  
+    &.top {
+      transform:  translate(-50%, -100%);
+    
+      &.open {
+        transform: translate(-50%, 0);
+      }
+    }
+  
+    &.left {
+      transform:  translate(-100%, -50%);
+    
+      &.open {
+        transform: translate(0, -50%);
+      }
+    }
+  
+    &.right {
+      transform:  translate(100%, -50%);
+    
+      &.open {
+        transform:  translate(0, -50%);
+      }
+    }
+  }
+}
