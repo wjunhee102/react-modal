@@ -2,7 +2,48 @@ export type DefaultModalName = "clear" | "unknown";
 
 export type ModalRemovedName = DefaultModalName | string | string[];
 
-export type ModalPosition = "center" | "bottom" | "top" | "left" | "right";
+export interface ModalTransition {
+  transitionProperty: string;
+  transitionDuration: string;
+  transitionTimingFunction: string;
+  transitionDelay: string;
+}
+
+export type ModalTransitionProps = {
+  [key in keyof ModalTransition]?: ModalTransition[key];
+}
+
+export type DefaultModalPosition = "center" | "bottom" | "top" | "left" | "right" | "default";
+
+export interface PositionStyle {
+  left?: string;
+  right?: string;
+  top?: string;
+  bottom?: string;
+  transform?: string;
+  opacity?: number;
+}
+
+export interface ModalPositionStyle {
+  initial: PositionStyle;
+  active: PositionStyle;
+  final: PositionStyle;
+}
+
+export type ModalPositionTable<T extends string = string> = {
+  [key in (DefaultModalPosition | T)]: ModalPositionStyle;
+}
+
+export type ModalPositionMap<T extends string = string> = Map<T | DefaultModalPosition, ModalPositionStyle>;
+
+export interface ModalManagerOptionsProps<T extends string> {
+  position?: ModalPositionTable<T>;
+  transition?: ModalTransition;
+}
+
+export type ModalTransitionOptions = Omit<ModalTransitionProps, "transitionDuration">;
+
+
 export interface ModalDispatchOptions {
   confirmModalCallback?: (props?: any) => void;
   cancelModalCallback?: (props?: any) => void;
@@ -15,14 +56,15 @@ export interface ModalDispatchOptions {
   coverCallbackType?: "confirm" | "cancel" | "sub" | "none" | "block";
   coverColor?: string;
   coverOpacity?: number;
-  title?: React.ReactNode;
-  content?: React.ReactNode;
-  confirmContent?: React.ReactNode;
-  cancelContent?: React.ReactNode;
-  subContent?: React.ReactNode;
+  title?: React.ReactNode | React.ReactElement;
+  content?: React.ReactNode | React.ReactElement;
+  confirmContent?: React.ReactNode | React.ReactElement;
+  cancelContent?: React.ReactNode | React.ReactElement;
+  subContent?: React.ReactNode | React.ReactElement;
   payload?: any;
   duration?: number;
-  position?: ((breakPoint: number) => ModalPosition) | ModalPosition;
+  transitionOptions?: ModalTransitionOptions;
+  position?: ((breakPoint: number) => DefaultModalPosition | string) | DefaultModalPosition | string;
   required?: boolean;
 }
 

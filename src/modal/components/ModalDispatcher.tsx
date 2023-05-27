@@ -4,7 +4,7 @@ import { ModalComponentFiber, ModalFiber } from "../entities/types";
 import disableBodyScroll from "../utils/disableBodyScroll";
 import Modal from "./Modal";
 
-import styles from "./Modal.module.scss";
+import "./modal.css";
 
 interface ModalDispatcherProps {
   modalManager?: ModalManager;
@@ -84,16 +84,21 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
     }, []);
 
     return (
-      <div className={`${styles.modalDispatcher} ${isOpen ? styles.open : ""}`}>
+      <div className={`modalDispatcher-r ${isOpen ? "open-r" : ""}`}>
         <button
           type="button"
-          className={styles.modalClearBtn}
+          className="modalClearBtn-r"
           onClick={onClearModal}
         >
           {" "}
         </button>
         {modalFiberList.map((modalFiber) => (
-          <Modal key={modalFiber.id} breakPoint={breakPoint} {...modalFiber} />
+          <Modal 
+            key={modalFiber.id} 
+            breakPoint={breakPoint} 
+            modalManager={modalManager} 
+            {...modalFiber} 
+          />
         ))}
       </div>
     );

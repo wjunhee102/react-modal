@@ -1,23 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
+import ModalManager from "../services/modalManager";
 import { ModalCallbackType, ModalFiber, ModalOptions } from "../entities/types";
 
-import styles from "./Modal.module.scss";
+import "./modal.css";
 
 interface ModalProps extends ModalFiber {
+  modalManager: ModalManager;
   breakPoint: number;
 }
 
-const Modal = ({ breakPoint, component: Component, options }: ModalProps) => {
+const Modal = ({ modalManager, breakPoint, component: Component, options }: ModalProps) => {
+  const [isInit, setInit] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, setIsPending] = useState(true);
 
-  const { coverColor, coverOpacity, duration, position, isClose } = options;
+  const { coverColor, coverOpacity, duration, transitionOptions, position, isClose } = options;
 
-  const transition = useMemo(
-    () =>
-      duration && duration > 0 ? `all ${duration / 1000}s ease-in-out` : "",
-    [duration]
-  );
+  const transition = modalManager.getModalTrainsition(duration, transitionOptions);
 
   const modalOptions: ModalOptions = useMemo(
     () => ({
@@ -29,27 +28,6 @@ const Modal = ({ breakPoint, component: Component, options }: ModalProps) => {
     }),
     [options]
   );
-
-  const modalPosition = useMemo(() => {
-    const settedPosition =
-      typeof position === "function" ? position(breakPoint) : position;
-
-    switch (settedPosition) {
-      case "top":
-        return styles.top;
-      case "center":
-        return styles.center;
-      case "bottom":
-        return styles.bottom;
-      case "left":
-        return styles.left;
-      case "right":
-        return styles.right;
-      default:
-        return styles.center;
-    }
-    // eslint-disable-next-line
-  }, [breakPoint]);
 
   const coverCallback = useMemo(() => {
     const { coverCallbackType } = options;
@@ -82,8 +60,30 @@ const Modal = ({ breakPoint, component: Component, options }: ModalProps) => {
     }
   }, [options]);
 
+  const modalPosition = (() => {
+    const settedPosition =
+      typeof position === "function" ? position(breakPoint) : position;
+
+    const {
+      initial,
+      active,
+      final
+    } = modalManager.getModalPosition(settedPosition);
+
+    if (!isInit) {
+      return initial;
+    }
+
+    if (isOpen) {
+      return active;
+    }
+
+    return final;
+  })();
+
   const onCloseModal = () => {
-    if (isPending || !coverCallback) {
+    if (isPending || !coverCallback || modalManager.getIsPending()) {
+      console.log("pending", isPending, !coverCallback, modalManager.getIsPending());
       return;
     }
     const { callback, props } = coverCallback;
@@ -98,12 +98,14 @@ const Modal = ({ breakPoint, component: Component, options }: ModalProps) => {
     if (setTimeout) {
       asyncOpenModal = setTimeout(() => {
         setIsOpen(true);
+        setInit(true);
       }, 10);
       asyncPendingModal = setTimeout(() => {
         setIsPending(false);
       }, (options.duration || 0) + 10);
     } else {
       setIsOpen(true);
+      setInit(true);
       setIsPending(false);
     }
 
@@ -151,26 +153,26 @@ const Modal = ({ breakPoint, component: Component, options }: ModalProps) => {
   }, [isClose, isPending]);
 
   return (
-    <div className={styles.modal}>
+    <div className="modalWrapper-r">
       <button
-        className={`${styles.closeModalCover} ${isOpen ? "" : styles.close}`}
+        className={`closeModalCover-r ${isOpen ? "" : "close-r"}`}
         style={{
           backgroundColor: coverColor || "rgb(0, 0, 0)",
           opacity: coverOpacity || 0.5,
-          transition,
+          ...transition,
         }}
         type="button"
         onClick={onCloseModal}
       >
         {" "}
       </button>
-      <div className={styles.modalContentContainer}>
+      <div className="modalContentContainer-r">
         <div
-          className={`${styles.modalContent} ${modalPosition} ${
-            isOpen ? styles.open : ""
-          }`}
+          className="modalContent-r"
           style={{
-            transition,
+            ...modalPosition,
+            ...transition,
+            pointerEvents: (!isPending || isOpen) ? "auto" : "none"
           }}
         >
           <Component {...modalOptions} />

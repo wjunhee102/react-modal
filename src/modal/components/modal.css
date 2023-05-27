@@ -44,12 +44,12 @@
   height: 100%;
   pointer-events: auto;
   background: transparent;
-  cursor: default;
+  cursor: pointer;
 }
 
-.modalDispatcher-r .modalWrapper-r .closeModalCover.open-r {
-  opacity: 1 !important;
-  cursor: pointer;
+.modalDispatcher-r .modalWrapper-r .closeModalCover.close-r {
+  opacity: 0 !important;
+  cursor: default;
 }
 
 .modalDispatcher-r .modalWrapper-r .modalContentContainer-r {
@@ -60,7 +60,6 @@
   width: 100%;
   height: 100%;
   background: transparent;
-  pointer-events: none;
 }
 
 .modalDispatcher-r .modalWrapper-r .modalContentContainer-r .modalContent-r {
