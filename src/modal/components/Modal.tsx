@@ -3,6 +3,7 @@ import ModalManager from "../services/modalManager";
 import { ModalCallbackType, ModalFiber, ModalOptions } from "../entities/types";
 
 import "./modal.css";
+import { MODAL_POSITION } from "../contants/constants";
 
 interface ModalProps extends ModalFiber {
   modalManager: ModalManager;
@@ -15,8 +16,6 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
   const [isPending, setIsPending] = useState(true);
 
   const { coverColor, coverOpacity, duration, transitionOptions, position, isClose } = options;
-
-  const transition = modalManager.getModalTrainsition(duration, transitionOptions);
 
   const modalOptions: ModalOptions = useMemo(
     () => ({
@@ -60,9 +59,17 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
     }
   }, [options]);
 
+  const transition = modalManager.getModalTrainsition(duration, transitionOptions);
+
   const modalPosition = (() => {
     const settedPosition =
       typeof position === "function" ? position(breakPoint) : position;
+
+    const {
+      initial: defaultInitial,
+      active: defaultActive,
+      final: defautFinal,
+    } = modalManager.getModalPosition(MODAL_POSITION.default);
 
     const {
       initial,
@@ -71,19 +78,27 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
     } = modalManager.getModalPosition(settedPosition);
 
     if (!isInit) {
-      return initial;
+      return {
+        ...defaultInitial,
+        ...initial,
+      }
     }
 
     if (isOpen) {
-      return active;
+      return {
+        ...defaultActive,
+        ...active,
+      }
     }
 
-    return final;
+    return {
+      ...defautFinal,
+      ...final,
+    }
   })();
 
   const onCloseModal = () => {
     if (isPending || !coverCallback || modalManager.getIsPending()) {
-      console.log("pending", isPending, !coverCallback, modalManager.getIsPending());
       return;
     }
     const { callback, props } = coverCallback;

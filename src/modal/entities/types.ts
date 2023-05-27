@@ -13,7 +13,7 @@ export type ModalTransitionProps = {
   [key in keyof ModalTransition]?: ModalTransition[key];
 }
 
-export type DefaultModalPosition = "center" | "bottom" | "top" | "left" | "right" | "default";
+export type DefaultModalPosition = "center" | "bottom" | "top" | "left" | "right" | "default" | "leftCenterRight" | "rightCenterLeft";
 
 export interface PositionStyle {
   left?: string;
@@ -36,15 +36,16 @@ export type ModalPositionTable<T extends string = string> = {
 
 export type ModalPositionMap<T extends string = string> = Map<T | DefaultModalPosition, ModalPositionStyle>;
 
-export interface ModalManagerOptionsProps<T extends string> {
-  position?: ModalPositionTable<T>;
-  transition?: ModalTransition;
-}
 
 export type ModalTransitionOptions = Omit<ModalTransitionProps, "transitionDuration">;
 
+export interface ModalManagerOptionsProps<T extends string> {
+  position?: ModalPositionTable<T>;
+  transition?: ModalTransitionOptions;
+  duration?: number;
+}
 
-export interface ModalDispatchOptions {
+export interface ModalDispatchOptions<T extends string = string> {
   confirmModalCallback?: (props?: any) => void;
   cancelModalCallback?: (props?: any) => void;
   subModalCallback?: (props?: any) => void;
@@ -64,7 +65,7 @@ export interface ModalDispatchOptions {
   payload?: any;
   duration?: number;
   transitionOptions?: ModalTransitionOptions;
-  position?: ((breakPoint: number) => DefaultModalPosition | string) | DefaultModalPosition | string;
+  position?: ((breakPoint: number) => DefaultModalPosition | T) | DefaultModalPosition | T;
   required?: boolean;
 }
 
@@ -72,11 +73,11 @@ export type ModalCallbackType = (
   payload?: any
 ) => void | undefined | ModalRemovedName | string;
 
-export interface EditModalOptionsProps extends ModalDispatchOptions {
+export interface EditModalOptionsProps<T extends string = string> extends ModalDispatchOptions<T> {
   isClose?: boolean;
 }
 
-export interface ModalOptions extends EditModalOptionsProps {
+export interface ModalOptions<T extends string = string> extends EditModalOptionsProps<T> {
   closeModal: (callback?: ModalCallbackType, props?: any) => void;
 }
 
@@ -89,10 +90,10 @@ export type CloseModal = (closeModalProps: CloseModalProps) => void;
 
 export type ModalComponent = React.FC<ModalOptions>;
 
-export interface ModalComponentFiber {
+export interface ModalComponentFiber<T extends string = string> {
   name: string;
   component: ModalComponent;
-  defaultOptions?: ModalDispatchOptions;
+  defaultOptions?: ModalDispatchOptions<T>;
 }
 
 export interface ModalFiber<T extends ModalDispatchOptions = ModalOptions> {

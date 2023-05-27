@@ -47,7 +47,7 @@
   cursor: pointer;
 }
 
-.modalDispatcher-r .modalWrapper-r .closeModalCover.close-r {
+.modalDispatcher-r .modalWrapper-r .closeModalCover-r.close-r {
   opacity: 0 !important;
   cursor: default;
 }

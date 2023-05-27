@@ -12,11 +12,13 @@ export const MODAL_NAME: {
   unknown: "unknown",
 };
 
+export const DEFAULT_DURATION = 500;
+
 export const DEFAULT_TRANSITION: ModalTransition = {
   transitionProperty: "all",
-  transitionDuration: "300ms",
+  transitionDuration: `${DEFAULT_DURATION}ms`,
   transitionDelay: "0ms",
-  transitionTimingFunction: "ease-in-out",
+  transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1)",
 }
 
 export const MODAL_POSITION: {
@@ -28,6 +30,8 @@ export const MODAL_POSITION: {
   bottom: "bottom",
   left: "left",
   right: "right",
+  leftCenterRight: "leftCenterRight",
+  rightCenterLeft: "rightCenterLeft",
 }
 
 export const DEFAULT_POSITION: ModalPositionTable = {
@@ -125,6 +129,40 @@ export const DEFAULT_POSITION: ModalPositionTable = {
       right: "0px",
       top: "50%",
       transform: "translate(100%, -50%)",
+    }
+  },
+  leftCenterRight: {
+    initial: {
+      left: "0px",
+      top: "50%",
+      transform: "translate(-100%, -50%) scale(0)"
+    },
+    active: {
+      left: "50%",
+      top: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    final: {
+      right: "0px",
+      top: "50%",
+      transform: "translate(100%, -50%) scale(0)",
+    }
+  },
+  rightCenterLeft: {
+    initial: {
+      right: "0px",
+      top: "50%",
+      transform: "translate(100%, -50%) scale(1)",
+    }, 
+    active: {
+      left: "50%",
+      top: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    final: {
+      left: "0px",
+      top: "50%",
+      transform: "translate(-100%, -50%) scale(1)"
     }
   }
 }

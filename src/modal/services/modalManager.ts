@@ -1,4 +1,4 @@
-import { DEFAULT_POSITION, DEFAULT_TRANSITION, MODAL_NAME, MODAL_POSITION } from "../contants/constants";
+import { DEFAULT_DURATION, DEFAULT_POSITION, DEFAULT_TRANSITION, MODAL_NAME, MODAL_POSITION } from "../contants/constants";
 import {
   ModalListener,
   ModalComponentFiber,
@@ -28,6 +28,7 @@ class ModalManager<T extends string = string> {
   private modalComponentFiberMap: Map<string, ModalComponentFiber> = new Map();
   private modalPositionMap: ModalPositionMap = new Map();
   private modalTransition: ModalTransition = DEFAULT_TRANSITION;
+  private modalDuration: number = DEFAULT_DURATION;
 
   constructor(
     baseModalComponentFiber: ModalComponentFiber[] = [], 
@@ -63,7 +64,7 @@ class ModalManager<T extends string = string> {
       ...componentFiber,
       defaultOptions: {
         ...defaultOptions,
-        duration: defaultOptions?.duration ?? 250,
+        duration: defaultOptions?.duration || this.modalDuration,
         coverCallbackType: defaultOptions?.coverCallbackType ?? "cancel",
       },
     };
@@ -72,7 +73,7 @@ class ModalManager<T extends string = string> {
   }
 
   private initModalOptions(optionsProps: ModalManagerOptionsProps<T>) {
-    const { position, transition } = optionsProps;
+    const { position, transition, duration } = optionsProps;
   
     const initialPosition: ModalPositionTable = {
       ...DEFAULT_POSITION,
@@ -81,6 +82,7 @@ class ModalManager<T extends string = string> {
 
     this.setModalPosition(initialPosition);
     this.setModalTransition(transition);
+    this.setModalDuration(duration);
   }
 
   private getSettedModalFiber(
@@ -161,6 +163,17 @@ class ModalManager<T extends string = string> {
     }
     
     this.modalTransition = transition;
+
+    return this;
+  }
+
+  setModalDuration(duration: number = -1) {
+    if (duration < 0) {
+      return this;
+    }
+
+    this.modalDuration = duration;
+    this.setModalTransition({ transitionDuration: `${duration}ms` })
 
     return this;
   }
