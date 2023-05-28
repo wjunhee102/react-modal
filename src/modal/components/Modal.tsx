@@ -1,27 +1,42 @@
 import { useEffect, useMemo, useState } from "react";
 import ModalManager from "../services/modalManager";
-import { ModalCallbackType, ModalFiber, ModalOptions } from "../entities/types";
-
-import "./modal.css";
-import { MODAL_POSITION } from "../contants/constants";
+import { 
+  ModalCallbackType, 
+  ModalFiber, 
+  ModalOptions, 
+  ModalPositionState 
+} from "../entities/types";
+import { 
+  MODAL_CALLBACK_TYPE, 
+  MODAL_POSITION, 
+  MODAL_POSITION_STATE 
+} from "../contants/constants";
 
 interface ModalProps extends ModalFiber {
   modalManager: ModalManager;
   breakPoint: number;
 }
 
-const Modal = ({ modalManager, breakPoint, component: Component, options }: ModalProps) => {
-  const [isInit, setInit] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+const Modal = (
+  { 
+    modalManager, 
+    breakPoint, 
+    options, 
+    component: Component 
+  }: ModalProps
+) => {
+  const [positionState, setPositionState] = useState<ModalPositionState>(MODAL_POSITION_STATE.initial);
   const [isPending, setIsPending] = useState(true);
 
-  const { coverColor, coverOpacity, duration, transitionOptions, position, isClose } = options;
+  const { isClose } = options;
+
+  const isActive = positionState === MODAL_POSITION_STATE.active;
 
   const modalOptions: ModalOptions = useMemo(
     () => ({
       ...options,
       closeModal: (callback?: ModalCallbackType, props?: any) => {
-        setIsOpen(false);
+        setPositionState(MODAL_POSITION_STATE.final);
         options.closeModal(callback, props);
       },
     }),
@@ -29,23 +44,23 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
   );
 
   const coverCallback = useMemo(() => {
-    const { coverCallbackType } = options;
+    const { backCoverCallbackType } = options;
 
-    switch (coverCallbackType) {
-      case "none":
+    switch (backCoverCallbackType) {
+      case MODAL_CALLBACK_TYPE.block:
         return undefined;
 
-      case "cancel":
+      case MODAL_CALLBACK_TYPE.cancel:
         return {
           callback: options.cancelModalCallback,
           props: options.cancelModalCallbackProps,
         };
-      case "confirm":
+      case MODAL_CALLBACK_TYPE.confirm:
         return {
           callback: options.confirmModalCallback,
           props: options.confirmModalCallbackProps,
         };
-      case "sub":
+      case MODAL_CALLBACK_TYPE.sub:
         return {
           callback: options.subModalCallback,
           props: options.subModalCallbackProps,
@@ -59,46 +74,57 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
     }
   }, [options]);
 
-  const transition = modalManager.getModalTrainsition(duration, transitionOptions);
+  const {
+    modalStyle,
+    backCoverStyle,
+  }: {
+    modalStyle: React.CSSProperties;
+    backCoverStyle: React.CSSProperties;
+  } = useMemo(() => {
+    const { 
+      backCoverColor, 
+      backCoverOpacity, 
+      duration, 
+      transitionOptions, 
+      position, 
+    } = options;
 
-  const modalPosition = (() => {
     const settedPosition =
       typeof position === "function" ? position(breakPoint) : position;
-
-    const {
-      initial: defaultInitial,
-      active: defaultActive,
-      final: defautFinal,
-    } = modalManager.getModalPosition(MODAL_POSITION.default);
-
-    const {
-      initial,
-      active,
-      final
-    } = modalManager.getModalPosition(settedPosition);
-
-    if (!isInit) {
-      return {
-        ...defaultInitial,
-        ...initial,
-      }
-    }
-
-    if (isOpen) {
-      return {
-        ...defaultActive,
-        ...active,
-      }
-    }
+    
+    const backCoverStyle = modalManager.getCurrentModalPosition(positionState, MODAL_POSITION.backCover);
+    const modalStyle = modalManager.getCurrentModalPosition(positionState, settedPosition);
+    const transition = modalManager.getModalTrainsition(duration, transitionOptions);
+    const isActiveState = positionState === MODAL_POSITION_STATE.active;
 
     return {
-      ...defautFinal,
-      ...final,
+      modalStyle: {
+        pointerEvents: (!isPending && isActiveState) ? "auto" : "none",
+        ...transition,
+        ...modalStyle,
+      },
+      backCoverStyle: {
+        ...transition,
+        cursor: isActiveState ? "pointer" : "default",
+        ...backCoverStyle,
+        background: (isActiveState && backCoverColor) || backCoverStyle.background,
+        opacity: (isActiveState && backCoverOpacity) || backCoverStyle.opacity,
+      }
     }
-  })();
+  }, [
+    options, 
+    modalManager, 
+    breakPoint, 
+    positionState, 
+    isPending
+  ]);
 
   const onCloseModal = () => {
-    if (isPending || !coverCallback || modalManager.getIsPending()) {
+    if (
+      isPending || 
+      !coverCallback || 
+      modalManager.getIsPending()
+    ) {
       return;
     }
     const { callback, props } = coverCallback;
@@ -112,15 +138,13 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
 
     if (setTimeout) {
       asyncOpenModal = setTimeout(() => {
-        setIsOpen(true);
-        setInit(true);
+        setPositionState(MODAL_POSITION_STATE.active);
       }, 10);
       asyncPendingModal = setTimeout(() => {
         setIsPending(false);
-      }, (options.duration || 0) + 10);
+      }, (options.duration ?? 0) + 10);
     } else {
-      setIsOpen(true);
-      setInit(true);
+      setPositionState(MODAL_POSITION_STATE.active);
       setIsPending(false);
     }
 
@@ -129,14 +153,12 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
         asyncOpenModal && clearTimeout(asyncOpenModal);
         asyncPendingModal && clearTimeout(asyncPendingModal);
       }
-      setIsOpen(false);
-      setIsPending(false);
     };
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
+    if (positionState === MODAL_POSITION_STATE.active) {
       // eslint-disable-next-line
       return () => {};
     }
@@ -147,7 +169,7 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
     if (setTimeout) {
       asyncPendingModal = setTimeout(() => {
         setIsPending(false);
-      }, options.duration || 0);
+      }, options.duration ?? 0);
     } else {
       setIsPending(false);
     }
@@ -158,7 +180,7 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
       }
     };
     // eslint-disable-next-line
-  }, [isOpen]);
+  }, [positionState]);
 
   useEffect(() => {
     if (!isPending && isClose) {
@@ -170,12 +192,8 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
   return (
     <div className="modalWrapper-r">
       <button
-        className={`closeModalCover-r ${isOpen ? "" : "close-r"}`}
-        style={{
-          backgroundColor: coverColor || "rgb(0, 0, 0)",
-          opacity: coverOpacity || 0.5,
-          ...transition,
-        }}
+        className={`closeModalCover-r ${isActive ? "" : "close-r"}`}
+        style={backCoverStyle}
         type="button"
         onClick={onCloseModal}
       >
@@ -184,11 +202,7 @@ const Modal = ({ modalManager, breakPoint, component: Component, options }: Moda
       <div className="modalContentContainer-r">
         <div
           className="modalContent-r"
-          style={{
-            ...modalPosition,
-            ...transition,
-            pointerEvents: (!isPending || isOpen) ? "auto" : "none"
-          }}
+          style={modalStyle}
         >
           <Component {...modalOptions} />
         </div>

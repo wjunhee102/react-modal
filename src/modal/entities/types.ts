@@ -13,7 +13,16 @@ export type ModalTransitionProps = {
   [key in keyof ModalTransition]?: ModalTransition[key];
 }
 
-export type DefaultModalPosition = "center" | "bottom" | "top" | "left" | "right" | "default" | "leftCenterRight" | "rightCenterLeft";
+export type DefaultModalPosition = "default" | 
+  "backCover" |
+  "bottom" | 
+  "top" | 
+  "left" | 
+  "right" | 
+  "center" | 
+  "leftCenterRight" | 
+  "rightCenterLeft"
+;
 
 export interface PositionStyle {
   left?: string;
@@ -22,12 +31,13 @@ export interface PositionStyle {
   bottom?: string;
   transform?: string;
   opacity?: number;
+  background?: string;
 }
 
-export interface ModalPositionStyle {
-  initial: PositionStyle;
-  active: PositionStyle;
-  final: PositionStyle;
+export type ModalPositionState = "initial" | "active" | "final";
+
+export type ModalPositionStyle = {
+  [key in ModalPositionState]: PositionStyle;
 }
 
 export type ModalPositionTable<T extends string = string> = {
@@ -36,14 +46,17 @@ export type ModalPositionTable<T extends string = string> = {
 
 export type ModalPositionMap<T extends string = string> = Map<T | DefaultModalPosition, ModalPositionStyle>;
 
-
 export type ModalTransitionOptions = Omit<ModalTransitionProps, "transitionDuration">;
 
 export interface ModalManagerOptionsProps<T extends string> {
   position?: ModalPositionTable<T>;
   transition?: ModalTransitionOptions;
   duration?: number;
+  backCoverColor?: string;
+  backCoverOpacity?: number;
 }
+
+export type ModalBackCoverCallbackType = "confirm" | "cancel" | "sub" | "none" | "block";
 
 export interface ModalDispatchOptions<T extends string = string> {
   confirmModalCallback?: (props?: any) => void;
@@ -54,9 +67,9 @@ export interface ModalDispatchOptions<T extends string = string> {
   cancelModalCallbackProps?: any;
   subModalCallbackProps?: any;
   essentialCallbackProps?: any;
-  coverCallbackType?: "confirm" | "cancel" | "sub" | "none" | "block";
-  coverColor?: string;
-  coverOpacity?: number;
+  backCoverCallbackType?: ModalBackCoverCallbackType;
+  backCoverColor?: string;
+  backCoverOpacity?: number;
   title?: React.ReactNode | React.ReactElement;
   content?: React.ReactNode | React.ReactElement;
   confirmContent?: React.ReactNode | React.ReactElement;
@@ -77,8 +90,11 @@ export interface EditModalOptionsProps<T extends string = string> extends ModalD
   isClose?: boolean;
 }
 
+export type ModalAsyncCall<T = any, P = any> = (asyncCallback: (props: P) => T, asyncCallbackProps: P) => void;
+
 export interface ModalOptions<T extends string = string> extends EditModalOptionsProps<T> {
   closeModal: (callback?: ModalCallbackType, props?: any) => void;
+  call: ModalAsyncCall;
 }
 
 export type CloseModalProps =

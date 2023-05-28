@@ -1,4 +1,11 @@
-import { DEFAULT_DURATION, DEFAULT_POSITION, DEFAULT_TRANSITION, MODAL_NAME, MODAL_POSITION } from "../contants/constants";
+import { 
+  DEFAULT_DURATION, 
+  DEFAULT_POSITION, 
+  DEFAULT_TRANSITION, 
+  MODAL_NAME, 
+  MODAL_POSITION, 
+  MODAL_POSITION_STATE
+} from "../contants/constants";
 import {
   ModalListener,
   ModalComponentFiber,
@@ -16,6 +23,7 @@ import {
   ModalTransitionProps,
   ModalPositionStyle,
   ModalTransitionOptions,
+  ModalPositionState,
 } from "../entities/types";
 import { checkDefaultModalName } from "../utils/checkDefaultModalName";
 import { getCloseModal } from "../utils/getCloseModal";
@@ -65,7 +73,7 @@ class ModalManager<T extends string = string> {
       defaultOptions: {
         ...defaultOptions,
         duration: defaultOptions?.duration || this.modalDuration,
-        coverCallbackType: defaultOptions?.coverCallbackType ?? "cancel",
+        coverCallbackType: defaultOptions?.backCoverCallbackType ?? "cancel",
       },
     };
 
@@ -97,6 +105,7 @@ class ModalManager<T extends string = string> {
       options: {
         ...modalFiber.options,
         closeModal,
+        call: this.call,
       },
     };
 
@@ -146,10 +155,46 @@ class ModalManager<T extends string = string> {
     if (!position) {
       const center = this.modalPositionMap.get(MODAL_POSITION.center);
 
-      return center || DEFAULT_POSITION.center;
+      return center ?? DEFAULT_POSITION.center;
     }
 
     return position;
+  }
+
+  getCurrentModalPosition(
+    positionState: ModalPositionState, 
+    position: string = MODAL_POSITION.center
+  ) {
+    const {
+      initial: defaultInitial,
+      active: defaultActive,
+      final: defautFinal,
+    } = this.getModalPosition(MODAL_POSITION.default);
+
+    const {
+      initial,
+      active,
+      final,
+    } = this.getModalPosition(position);
+
+    if (positionState === MODAL_POSITION_STATE.initial) {
+      return {
+        ...defaultInitial,
+        ...initial,
+      }
+    }
+
+    if (positionState === MODAL_POSITION_STATE.active) {
+      return {
+        ...defaultActive,
+        ...active,
+      }
+    }
+
+    return {
+      ...defautFinal,
+      ...final,
+    }
   }
 
   setModalTransition(transitionProps?: ModalTransitionProps) {

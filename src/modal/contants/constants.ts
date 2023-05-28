@@ -2,7 +2,9 @@ import {
   DefaultModalName, 
   DefaultModalPosition, 
   ModalPositionTable, 
-  ModalTransition
+  ModalPositionState, 
+  ModalTransition,
+  ModalBackCoverCallbackType,
 } from "../entities/types";
 
 export const MODAL_NAME: {
@@ -11,6 +13,16 @@ export const MODAL_NAME: {
   clear: "clear",
   unknown: "unknown",
 };
+
+export const MODAL_CALLBACK_TYPE: {
+  [key in ModalBackCoverCallbackType]: key;
+} = {
+  none: "none",
+  confirm: "confirm",
+  cancel: "cancel",
+  sub: "sub",
+  block: "block",
+}
 
 export const DEFAULT_DURATION = 500;
 
@@ -21,10 +33,19 @@ export const DEFAULT_TRANSITION: ModalTransition = {
   transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1)",
 }
 
+export const MODAL_POSITION_STATE: {
+  [key in ModalPositionState]: key
+} = {
+  initial: "initial",
+  active: "active",
+  final: "final",
+}
+
 export const MODAL_POSITION: {
   [key in DefaultModalPosition]: key;
 } = {
   default: "default",
+  backCover: "backCover",
   center: "center",
   top: "top",
   bottom: "bottom",
@@ -35,132 +56,152 @@ export const MODAL_POSITION: {
 }
 
 export const DEFAULT_POSITION: ModalPositionTable = {
-  default: {
-    initial: {
+  [MODAL_POSITION.default]: {
+    [MODAL_POSITION_STATE.initial]: {
       opacity: 0,
     },
-    active: {
+    [MODAL_POSITION_STATE.active]: {
       opacity: 1,
     },
-    final: {
+    [MODAL_POSITION_STATE.final]: {
       opacity: 0,
     }
   },
-  center: {
-    initial: {
+  [MODAL_POSITION.backCover]: {
+    [MODAL_POSITION_STATE.initial]: {
+      top: "0",
+      left: "0",
+      background: "rgb(0, 0, 0)",
+      opacity: 0,
+    },
+    [MODAL_POSITION_STATE.active]: {
+      top: "0",
+      left: "0",
+      background: "rgb(0, 0, 0)",
+      opacity: 0.5,
+    },
+    [MODAL_POSITION_STATE.final]: {
+      top: "0",
+      left: "0",
+      background: "rgb(0, 0, 0)",
+      opacity: 0,
+    }
+  },
+  [MODAL_POSITION.center]: {
+    [MODAL_POSITION_STATE.initial]: {
       left: "50%",
       top: "50%",
       transform: "translate(-50%, -50%) scale(0)",
     },
-    active: {
+    [MODAL_POSITION_STATE.active]: {
       left: "50%",
       top: "50%",
       transform: "translate(-50%, -50%) scale(1)",
     },
-    final: {
+    [MODAL_POSITION_STATE.final]: {
       left: "50%",
       top: "50%",
       transform: "translate(-50%, -50%) scale(0)",
     }
   },
-  bottom: {
-    initial: {
+  [MODAL_POSITION.bottom]: {
+    [MODAL_POSITION_STATE.initial]: {
       left: "50%",
-      bottom: "0px",
+      bottom: "0",
       transform: "translate(-50%, 100%)"
     },
-    active: {
+    [MODAL_POSITION_STATE.active]: {
       left: "50%",
-      bottom: "0px",
+      bottom: "0",
       transform: "translate(-50%, 0)",
     },
-    final: {
+    [MODAL_POSITION_STATE.final]: {
       left: "50%",
-      bottom: "0px",
+      bottom: "0",
       transform: "translate(-50%, 100%)",
     }
   },
-  top: {
-    initial: {
+  [MODAL_POSITION.top]: {
+    [MODAL_POSITION_STATE.initial]: {
       left: "50%",
-      top: "0px",
+      top: "0",
       transform: "translate(-50%, -100%)",
     },
-    active: {
+    [MODAL_POSITION_STATE.active]: {
       left: "50%",
-      top: "0px",
+      top: "0",
       transform: "translate(-50%, 0)",
     },
-    final: {
+    [MODAL_POSITION_STATE.final]: {
       left: "50%",
-      top: "0px",
+      top: "0",
       transform: "translate(-50%, -100%)",
     }
   },
-  left: {
-    initial: {
-      left: "0px",
+  [MODAL_POSITION.left]: {
+    [MODAL_POSITION_STATE.initial]: {
+      left: "0",
       top: "50%",
       transform: "translate(-100%, -50%)"
     },
-    active: {
-      left: "0px",
+    [MODAL_POSITION_STATE.active]: {
+      left: "0",
       top: "50%",
       transform: "translate(0, -50%)",
     },
-    final: {
-      left: "0px",
+    [MODAL_POSITION_STATE.final]: {
+      left: "0",
       top: "50%",
       transform: "translate(-100%, -50%)",
     }
   },
-  right: {
-    initial: {
-      right: "0px",
+  [MODAL_POSITION.right]: {
+    [MODAL_POSITION_STATE.initial]: {
+      right: "0",
       top: "50%",
       transform: "translate(100%, -50%)",
     },
-    active: {
-      right: "0px",
+    [MODAL_POSITION_STATE.active]: {
+      right: "0",
       top: "50%",
       transform: "translate(0, -50%)",
     },
-    final: {
-      right: "0px",
+    [MODAL_POSITION_STATE.final]: {
+      right: "0",
       top: "50%",
       transform: "translate(100%, -50%)",
     }
   },
   leftCenterRight: {
-    initial: {
-      left: "0px",
+    [MODAL_POSITION_STATE.initial]: {
+      left: "0",
       top: "50%",
       transform: "translate(-100%, -50%) scale(0)"
     },
-    active: {
+    [MODAL_POSITION_STATE.active]: {
       left: "50%",
       top: "50%",
       transform: "translate(-50%, -50%) scale(1)",
     },
-    final: {
-      right: "0px",
+    [MODAL_POSITION_STATE.final]: {
+      right: "0",
       top: "50%",
       transform: "translate(100%, -50%) scale(0)",
     }
   },
   rightCenterLeft: {
-    initial: {
-      right: "0px",
+    [MODAL_POSITION_STATE.initial]: {
+      right: "0",
       top: "50%",
       transform: "translate(100%, -50%) scale(1)",
     }, 
-    active: {
+    [MODAL_POSITION_STATE.active]: {
       left: "50%",
       top: "50%",
       transform: "translate(-50%, -50%) scale(1)",
     },
-    final: {
-      left: "0px",
+    [MODAL_POSITION_STATE.final]: {
+      left: "0",
       top: "50%",
       transform: "translate(-100%, -50%) scale(1)"
     }

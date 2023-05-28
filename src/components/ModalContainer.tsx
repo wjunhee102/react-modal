@@ -62,7 +62,7 @@ const modalComponentMetaList: ModalComponentMeta[] = [
     defaultOptions: {
       duration: 400,
       position: (breackPoint) => breackPoint > 500 ? "center" : "bottom",
-      coverCallbackType: "none"
+      backCoverCallbackType: "none"
     }
   },
   {
