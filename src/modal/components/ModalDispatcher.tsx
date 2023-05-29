@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ModalManager from "../services/modalManager";
-import { ModalComponentFiber, ModalFiber } from "../entities/types";
+import { ModalComponentFiber, ModalFiber, ModalListener } from "../entities/types";
 import disableBodyScroll from "../utils/disableBodyScroll";
 import Modal from "./Modal";
 
@@ -21,16 +21,25 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
     const [modalFiberList, setModalFiberList] = useState<ModalFiber[]>([]);
     const [breakPoint, setBreakPoint] = useState(window?.innerWidth ?? 0);
     const [isOpen, setIsOpen] = useState(false);
+    const [isPending, setIsPending] = useState(false);
 
     const onClearModal = () => {
-      if (isOpen && modalFiberList.length > 0) {
+      if (
+        isOpen && 
+        modalFiberList.length > 0 &&
+        !isPending
+      ) {
         modalManager.popModalFiber("clear");
       }
     };
 
     useEffect(() => {
-      const listener = (modalFiberStack: ModalFiber[]) => {
+      const listener: ModalListener = ({
+        modalFiberStack,
+        isPending: pending,
+      }) => {
         setModalFiberList(modalFiberStack);
+        setIsPending(pending);
       };
 
       if (modalComponentMeta) {
@@ -96,7 +105,8 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
           <Modal 
             key={modalFiber.id} 
             breakPoint={breakPoint} 
-            modalManager={modalManager} 
+            modalManager={modalManager}
+            isPending={isPending}
             {...modalFiber} 
           />
         ))}

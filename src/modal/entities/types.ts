@@ -1,3 +1,12 @@
+export interface ModalListenerProps {
+  modalFiberStack: ModalFiber<ModalOptions>[];
+  isPending: boolean;
+}
+
+export type ModalListener = (
+  listenerProps: ModalListenerProps
+) => void;
+
 export type DefaultModalName = "clear" | "unknown";
 
 export type ModalRemovedName = DefaultModalName | string | string[];
@@ -90,7 +99,7 @@ export interface EditModalOptionsProps<T extends string = string> extends ModalD
   isClose?: boolean;
 }
 
-export type ModalAsyncCall<T = any, P = any> = (asyncCallback: (props: P) => T, asyncCallbackProps: P) => void;
+export type ModalAsyncCall<T = any, P = any> = (asyncCallback: (props: P) => T, asyncCallbackProps: P) => Promise<T>;
 
 export interface ModalOptions<T extends string = string> extends EditModalOptionsProps<T> {
   closeModal: (callback?: ModalCallbackType, props?: any) => void;
@@ -118,7 +127,3 @@ export interface ModalFiber<T extends ModalDispatchOptions = ModalOptions> {
   component: ModalComponent;
   options: T;
 }
-
-export type ModalListener = (
-  modalFiberStack: ModalFiber<ModalOptions>[]
-) => void;

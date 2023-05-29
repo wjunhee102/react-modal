@@ -25,18 +25,20 @@ export function getCloseModal({
   const closeModal = modalManager.remove;
 
   const close = (callback?: ModalCallbackType, props?: any) => {
+    modalManager.startPending();
+
     essentialCallback && essentialCallback(essentialCallbackProps);
     const removedName = callback && callback(props);
 
     if (!removedName) {
       closeModal(id);
-      modalManager.setIsPending(false);
-      
+      modalManager.endPending();
+
       return;
     }
 
     closeModal([id, removedName]);
-    modalManager.setIsPending(false);
+    modalManager.endPending();
   };
 
   if (duration === undefined) {
@@ -46,8 +48,6 @@ export function getCloseModal({
       if (isPending) {
         return;
       }
-
-      modalManager.setIsPending(true);
 
       close(callback, props);
     };
@@ -61,8 +61,6 @@ export function getCloseModal({
     if (isPending) {
       return;
     }
-
-    modalManager.setIsPending(true);
 
     if (setTimeout === undefined) {
       close(callback, props);

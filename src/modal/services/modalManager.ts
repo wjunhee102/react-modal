@@ -24,12 +24,14 @@ import {
   ModalPositionStyle,
   ModalTransitionOptions,
   ModalPositionState,
+  ModalListenerProps,
 } from "../entities/types";
 import { checkDefaultModalName } from "../utils/checkDefaultModalName";
 import { getCloseModal } from "../utils/getCloseModal";
 
 class ModalManager<T extends string = string> {
   private currentId: number = 0;
+  private callCount: number = 0;
   private isPending: boolean = false;
   private modalFiberStack: ModalFiber[] = [];
   private listeners: ModalListener[] = [];
@@ -110,6 +112,10 @@ class ModalManager<T extends string = string> {
     };
 
     return settedModalFiber;
+  }
+
+  getCallCount() {
+    return this.callCount;
   }
 
   getIsPending() {
@@ -233,10 +239,21 @@ class ModalManager<T extends string = string> {
     return this;
   }
 
+  setCallCount(command: "add" | "remove") {
+    if (command === "add") {
+      this.callCount++;
+    } else {
+      this.callCount--;
+    }
+
+    return this.callCount;
+  }
+
   setIsPending(isPending: boolean) {
     this.isPending = isPending;
-
-    return this.isPending;
+    this.notify();
+    
+    return isPending;
   }
 
   setModalComponent(
@@ -281,26 +298,30 @@ class ModalManager<T extends string = string> {
     this.listeners = this.listeners.filter((l) => l !== listener);
   }
 
-  async call<T = any, P =any>(asyncCallback: (props: P) => T, asyncCallbackProps: P) {
-    if (typeof asyncCallback !== "function") {
-      return;
-    }
-
+  startPending() {
     this.setIsPending(true);
+    this.callCount++;
 
-    try {
-      const data = await asyncCallback(asyncCallbackProps);
-    
-      return data;
-    } catch (e) {
-      return e;
-    } finally {
+    return this.callCount;
+  }
+
+  endPending() {
+    this.callCount--;
+
+    if (this.callCount < 1) {
       this.setIsPending(false);
     }
+
+    return this.callCount;
   }
 
   notify() {
-    this.listeners.forEach((listener) => listener(this.modalFiberStack));
+    const listenerProps: ModalListenerProps = {
+      modalFiberStack: this.modalFiberStack,
+      isPending: this.isPending,
+    }
+
+    this.listeners.forEach((listener) => listener(listenerProps));
   }
 
   editModalFiberProps(id: number, props: EditModalOptionsProps) {
@@ -373,6 +394,27 @@ class ModalManager<T extends string = string> {
     }
 
     this.notify();
+  }
+
+  async call<T = any, P = any>(
+    asyncCallback: (props: P) => T, 
+    asyncCallbackProps: P
+  ) {
+    if (typeof asyncCallback !== "function") {
+      throw new Error("modalManager.ts line 372: not function")
+    }
+
+    this.startPending();
+
+    try {
+      const data = await asyncCallback(asyncCallbackProps);
+    
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      this.endPending();
+    }
   }
 
   /**

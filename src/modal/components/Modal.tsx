@@ -11,22 +11,24 @@ import {
   MODAL_POSITION, 
   MODAL_POSITION_STATE 
 } from "../contants/constants";
+import { delay } from "../utils/delay";
 
 interface ModalProps extends ModalFiber {
   modalManager: ModalManager;
   breakPoint: number;
+  isPending: boolean;
 }
 
 const Modal = (
   { 
     modalManager, 
     breakPoint, 
+    isPending,
     options, 
     component: Component 
   }: ModalProps
 ) => {
   const [positionState, setPositionState] = useState<ModalPositionState>(MODAL_POSITION_STATE.initial);
-  const [isPending, setIsPending] = useState(true);
 
   const { isClose } = options;
 
@@ -43,7 +45,7 @@ const Modal = (
     [options]
   );
 
-  const coverCallback = useMemo(() => {
+  const backCoverCallback = useMemo(() => {
     const { backCoverCallbackType } = options;
 
     switch (backCoverCallbackType) {
@@ -99,13 +101,13 @@ const Modal = (
 
     return {
       modalStyle: {
-        pointerEvents: (!isPending && isActiveState) ? "auto" : "none",
+        pointerEvents: isActiveState ? "auto" : "none",
         ...transition,
         ...modalStyle,
       },
       backCoverStyle: {
-        ...transition,
         cursor: isActiveState ? "pointer" : "default",
+        ...transition,
         ...backCoverStyle,
         background: (isActiveState && backCoverColor) || backCoverStyle.background,
         opacity: (isActiveState && backCoverOpacity) || backCoverStyle.opacity,
@@ -115,43 +117,36 @@ const Modal = (
     options, 
     modalManager, 
     breakPoint, 
-    positionState, 
-    isPending
+    positionState
   ]);
 
   const onCloseModal = () => {
     if (
       isPending || 
-      !coverCallback || 
+      !backCoverCallback || 
       modalManager.getIsPending()
     ) {
       return;
     }
-    const { callback, props } = coverCallback;
+    const { callback, props } = backCoverCallback;
 
     modalOptions.closeModal(callback, props);
   };
 
   useEffect(() => {
     let asyncOpenModal: NodeJS.Timeout | null = null;
-    let asyncPendingModal: NodeJS.Timeout | null = null;
 
     if (setTimeout) {
       asyncOpenModal = setTimeout(() => {
         setPositionState(MODAL_POSITION_STATE.active);
       }, 10);
-      asyncPendingModal = setTimeout(() => {
-        setIsPending(false);
-      }, (options.duration ?? 0) + 10);
     } else {
       setPositionState(MODAL_POSITION_STATE.active);
-      setIsPending(false);
     }
 
     return () => {
       if (clearTimeout) {
         asyncOpenModal && clearTimeout(asyncOpenModal);
-        asyncPendingModal && clearTimeout(asyncPendingModal);
       }
     };
     // eslint-disable-next-line
@@ -159,26 +154,15 @@ const Modal = (
 
   useEffect(() => {
     if (positionState === MODAL_POSITION_STATE.active) {
-      // eslint-disable-next-line
-      return () => {};
-    }
-    let asyncPendingModal: NodeJS.Timeout | null = null;
-
-    setIsPending(true);
-
-    if (setTimeout) {
-      asyncPendingModal = setTimeout(() => {
-        setIsPending(false);
-      }, options.duration ?? 0);
-    } else {
-      setIsPending(false);
+      return;
     }
 
-    return () => {
-      if (clearTimeout) {
-        asyncPendingModal && clearTimeout(asyncPendingModal);
-      }
-    };
+    const {
+      duration,
+      call,
+    } = options;
+
+    call(delay, duration ?? 0);
     // eslint-disable-next-line
   }, [positionState]);
 

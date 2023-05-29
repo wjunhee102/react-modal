@@ -9,7 +9,13 @@ function delay(time: number) {
   })
 } 
 
-const Modal1: ModalComponent = ({ closeModal, confirmModalCallback, confirmModalCallbackProps, content }) => {
+const Modal1: ModalComponent = ({ 
+  closeModal, 
+  confirmModalCallback, 
+  confirmModalCallbackProps, 
+  content,
+  call,
+}) => {
   const [isLoading, setLoading] = useState(false);
   const [isSuccess, setSuccess] = useState(false);
 
@@ -20,7 +26,7 @@ const Modal1: ModalComponent = ({ closeModal, confirmModalCallback, confirmModal
   const onClickConfirm = async () => {
     setLoading(true);
 
-    const result: boolean = await delay(2000) as boolean;
+    const result: boolean = await call(delay, 2000) as boolean;
 
     setSuccess(result);
 
