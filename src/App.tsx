@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { ModalRegistrator, modalController } from './modal';
+import { Modal, modal } from './modal';
+import { api } from './api';
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,25 +22,59 @@ function App() {
         >
           Learn React
         </a>
-        <button onClick={() => modalController.open("modal1", { content: "모달 1"})}>모달 열기</button>
-        <button onClick={() => modalController.open("modal2", { content: "모달 2", position: "bottom" })}>모달2 열기</button>
+        <button onClick={() => modal("modal1", { confirmModalCallback: () => {
+          modal("modal2", { duration: 1000, position: "right" });
+        }, duration: 1000 })}>모달 열기</button>
+        <button 
+          onClick={() => {
+            modal(
+              "modal2", { 
+                content: "모달 2", 
+                position: "rightCenterLeft", 
+                duration: 500,
+                confirmModalCallback: () => {
+                  modal("modal2", {
+                    content: "모달 3", 
+                    position: "topCenterBottom", 
+                    duration: 500,
+                  });
+                }
+              }
+            );
+          }}
+        >
+          모달2 열기
+        </button>
+        <button onClick={() => modal("modal2", { content: "모달 3", title: "모달창입니다.", subContent: "서브콘텐츠입니다.", transitionOptions: { transitionProperty: "opacity" } })}>모달3 열기</button>
         <button onClick={() => setIsOpen(true)}>모달2 열기</button>
-        <ModalRegistrator name="modal2" open={isOpen} setOpen={(setIsOpen)}>
+        <button 
+          onClick={() => modal(
+            (props) => (<div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">안녕하세요 반갑습니다.</div>), {
+              duration: 5000, 
+              backCoverOpacity: 0.3,
+              backCoverColor: "#f0f"
+            }
+          )}
+        >모달3 열기</button>
+        <button onClick={() => api()}>api 모달 실패 열기</button>
+        <Modal name="modal2" open={isOpen} setOpen={setIsOpen} options={{ duration: 2000 }}>
           {
-            ({ closeModal, confirmModalCallback, confirmModalCallbackProps, content }) => (
+            ({ closeModal, confirmModalCallback }) => (
               <div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">
+                <h1>타이틀입니다.</h1>
                 <div>
-                  {content}
+                  ㄴㅁㅇㄴㅁㅇㄴㅁㅇ
                 </div>
-                <div className="flex justify-between items-center h-full px-4">
-                  <button onClick={() => closeModal()}>Close</button>
-                  <button onClick={() => closeModal(confirmModalCallback, confirmModalCallbackProps)}>Confirm</button>
+                {/* <p>ㅁㄴㅇㄴㅁㅇ</p> */}
+                <div className="flex items-center justify-between h-full px-4">
+                  <button className="h-2" onClick={() => setIsOpen(false)}>Close</button>
+                  <button className="h-2" onClick={() => closeModal(confirmModalCallback)}>Confirm</button>
                 </div>
               </div>
             )
           }
           
-        </ModalRegistrator>
+        </Modal>
       </header>
     </div>
   );

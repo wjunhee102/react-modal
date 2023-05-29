@@ -205,5 +205,22 @@ export const DEFAULT_POSITION: ModalPositionTable = {
       top: "50%",
       transform: "translate(-100%, -50%) scale(1)"
     }
+  },
+  topCenterBottom: {
+    [MODAL_POSITION_STATE.initial]: {
+      top: "0",
+      left: "50%",
+      transform: "translate(-50%, 0%) scale(1)",
+    }, 
+    [MODAL_POSITION_STATE.active]: {
+      left: "50%",
+      top: "50%",
+      transform: "translate(-50%, -50%) scale(1)",
+    },
+    [MODAL_POSITION_STATE.final]: {
+      left: "0",
+      top: "50%",
+      transform: "translate(-100%, -50%) scale(1)"
+    }
   }
 }

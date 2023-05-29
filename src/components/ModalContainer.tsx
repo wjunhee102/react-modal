@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ModalComponent, ModalComponentMeta, ModalProvider } from "../modal";
 
 function delay(time: number) {
+  console.log("delay");
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true);
@@ -23,12 +24,23 @@ const Modal1: ModalComponent = ({
     closeModal();
   }
 
-  const onClickConfirm = async () => {
+  const onClickCallApi = async () => {
     setLoading(true);
 
     const result: boolean = await call(delay, 2000) as boolean;
+    // const result: boolean = await delay(2000) as boolean;
 
     setSuccess(result);
+  }
+
+  const onClickConfirm = async () => {
+    // console.log("onClickConfirm");
+    // setLoading(true);
+
+    // // const result: boolean = await call(delay, 2000) as boolean;
+    // const result: boolean = await delay(2000) as boolean;
+
+    // setSuccess(result);
 
     closeModal(confirmModalCallback);
   }
@@ -47,6 +59,7 @@ const Modal1: ModalComponent = ({
       </div>
       <div className="flex items-center justify-between h-full px-4">
         <button onClick={onClickClose}>Close</button>
+        <button onClick={onClickCallApi}>Api</button>
         <button onClick={onClickConfirm}>Confirm</button>
       </div>
     </div>

@@ -57,7 +57,6 @@ export function getCloseModal({
 
   return (callback?: ModalCallbackType, props?: any) => {
     const isPending = modalManager.getIsPending();
-
     if (isPending) {
       return;
     }
