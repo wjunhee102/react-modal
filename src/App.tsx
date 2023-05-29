@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Modal, modal } from './modal';
+import { Modal, defaultModalManager, modal } from './modal';
 import { api } from './api';
+
+defaultModalManager.setModalComponent({
+  name: "modal5",
+  component: (props) => {
+    return (
+      <div>
+        안녕하세여
+      </div>
+    )
+  }
+});
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isOpen2, setIsOpen2] = useState(false);
+
+  useEffect(() => {
+    setIsOpen2(true);
+  }, []);
 
   return (
     <div className="App">
@@ -73,7 +89,20 @@ function App() {
               </div>
             )
           }
-          
+        </Modal>
+        <Modal open={isOpen2} setOpen={setIsOpen2} options={{ 
+          duration: 5000
+        }}>
+          {
+            ({ closeModal }) => {
+              return (
+                <div className="bg-white">
+                  안녕하세요
+                  {/* <button onClick={() => {closeModal()}}>닫기</button> */}
+                </div>
+              )
+            }
+          }
         </Modal>
       </header>
     </div>

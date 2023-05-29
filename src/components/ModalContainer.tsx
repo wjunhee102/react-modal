@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ModalComponent, ModalComponentMeta, ModalProvider } from "../modal";
+import { ModalComponent, ModalComponentMeta, ModalProvider, modal } from "../modal";
 
 function delay(time: number) {
   console.log("delay");

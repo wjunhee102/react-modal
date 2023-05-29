@@ -12,6 +12,12 @@ export async function api() {
   const result: any = await delay(5000);
 
   if (!result) {
-    modal("normal", { content: "api error", position: "top"})
+    modal(() => {
+      return (
+        <div>
+          sadsadsadd
+        </div>
+      )
+    }, { content: "api error", position: "top"})
   }
 }
