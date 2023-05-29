@@ -38,11 +38,14 @@ const Modal = (
     () => ({
       ...options,
       closeModal: (callback?: ModalCallbackType, props?: any) => {
+        if (isPending) {
+          return;
+        }
         setPositionState(MODAL_POSITION_STATE.final);
         options.closeModal(callback, props);
       },
     }),
-    [options]
+    [options, isPending]
   );
 
   const backCoverCallback = useMemo(() => {
