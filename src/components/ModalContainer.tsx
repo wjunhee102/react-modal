@@ -12,8 +12,8 @@ function delay(time: number) {
 
 const Modal1: ModalFC = ({ 
   closeModal, 
-  confirmModalCallback, 
-  confirmModalCallbackProps, 
+  confirmCallback, 
+  confirmCallbackProps, 
   content,
   call,
 }) => {
@@ -42,7 +42,7 @@ const Modal1: ModalFC = ({
 
     // setSuccess(result);
 
-    closeModal(confirmModalCallback);
+    closeModal(confirmCallback);
   }
   
   return (

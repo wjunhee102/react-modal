@@ -38,7 +38,7 @@ function App() {
         >
           Learn React
         </a>
-        <button onClick={() => openModal("modal1", { confirmModalCallback: () => {
+        <button onClick={() => openModal("modal1", { confirmCallback: () => {
           openModal("modal2", { duration: 1000, position: "right" });
         }, duration: 1000 })}>모달 열기</button>
         <button 
@@ -48,7 +48,7 @@ function App() {
                 content: "모달 2", 
                 position: "rightCenterLeft", 
                 duration: 500,
-                confirmModalCallback: () => {
+                confirmCallback: () => {
                   openModal("modal2", {
                     content: "모달 3", 
                     position: "topCenterBottom", 
@@ -75,7 +75,7 @@ function App() {
         <button onClick={() => api()}>api 모달 실패 열기</button>
         <Modal name="modal2" open={isOpen} setOpen={setIsOpen} options={{ duration: 2000 }}>
           {
-            ({ closeModal, confirmModalCallback }) => (
+            ({ closeModal, confirmCallback }) => (
               <div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">
                 <h1>타이틀입니다.</h1>
                 <div>
@@ -84,7 +84,7 @@ function App() {
                 {/* <p>ㅁㄴㅇㄴㅁㅇ</p> */}
                 <div className="flex items-center justify-between h-full px-4">
                   <button className="h-2" onClick={() => setIsOpen(false)}>Close</button>
-                  <button className="h-2" onClick={() => closeModal(confirmModalCallback)}>Confirm</button>
+                  <button className="h-2" onClick={() => closeModal(confirmCallback)}>Confirm</button>
                 </div>
               </div>
             )
