@@ -27,7 +27,7 @@ export const MODAL_CALLBACK_TYPE: {
 export const DEFAULT_DURATION = 500;
 
 export const DEFAULT_TRANSITION: ModalTransition = {
-  transitionProperty: "all",
+  transitionProperty: "opacity, transform, left, top, bottom, right, background, background-color",
   transitionDuration: `${DEFAULT_DURATION}ms`,
   transitionDelay: "0ms",
   transitionTimingFunction: "cubic-bezier(0.25, 0.1, 0.25, 1)",
