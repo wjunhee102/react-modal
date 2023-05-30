@@ -13,7 +13,7 @@ import {
 export const ModalManager = Manager;
 export const setModalController = setController;
 export const setModalProvider = setDispatcher;
-export const setModalRegistrator = setRegistrator;
+export const setModal = setRegistrator;
 export const setUseIsOpenModal = setUseIsOpen;
 
 export const defaultModalManager = new Manager();
@@ -21,9 +21,11 @@ export const modalController = setController(defaultModalManager);
 export const ModalProvider = setDispatcher(defaultModalManager);
 export const Modal = setRegistrator(defaultModalManager);
 export const useIsOpenModal = setUseIsOpen(defaultModalManager);
-export const modal = modalController.open;
+export const openModal = modalController.open;
+export const closeModal = modalController.close;
 
 export type ModalOptions = Options;
 export type ModalCallbackType = CallbackType;
-export type ModalComponent = Component;
-export type ModalComponentMeta = ComponentFiber;
+export type ModalFC = Component;
+export type ModalMeta = ComponentFiber;
+

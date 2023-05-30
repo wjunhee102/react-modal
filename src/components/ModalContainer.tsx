@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ModalComponent, ModalComponentMeta, ModalProvider, modal } from "../modal";
+import { ModalFC, ModalMeta, ModalProvider } from "../modal";
 
 function delay(time: number) {
   console.log("delay");
@@ -10,7 +10,7 @@ function delay(time: number) {
   })
 } 
 
-const Modal1: ModalComponent = ({ 
+const Modal1: ModalFC = ({ 
   closeModal, 
   confirmModalCallback, 
   confirmModalCallbackProps, 
@@ -74,7 +74,7 @@ const Modal2: any = ({ content }: any) => {
   return <div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">{content}</div>;
 }
 
-const modalComponentMetaList: ModalComponentMeta[] = [
+const modalComponentMetaList: ModalMeta[] = [
   {
     name: "modal1",
     component: Modal1,

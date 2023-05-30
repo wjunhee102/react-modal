@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Modal, defaultModalManager, modal } from './modal';
+import { Modal, defaultModalManager, openModal } from './modal';
 import { api } from './api';
 
 defaultModalManager.setModalComponent({
@@ -38,18 +38,18 @@ function App() {
         >
           Learn React
         </a>
-        <button onClick={() => modal("modal1", { confirmModalCallback: () => {
-          modal("modal2", { duration: 1000, position: "right" });
+        <button onClick={() => openModal("modal1", { confirmModalCallback: () => {
+          openModal("modal2", { duration: 1000, position: "right" });
         }, duration: 1000 })}>모달 열기</button>
         <button 
           onClick={() => {
-            modal(
+            openModal(
               "modal2", { 
                 content: "모달 2", 
                 position: "rightCenterLeft", 
                 duration: 500,
                 confirmModalCallback: () => {
-                  modal("modal2", {
+                  openModal("modal2", {
                     content: "모달 3", 
                     position: "topCenterBottom", 
                     duration: 500,
@@ -61,10 +61,10 @@ function App() {
         >
           모달2 열기
         </button>
-        <button onClick={() => modal("modal2", { content: "모달 3", title: "모달창입니다.", subContent: "서브콘텐츠입니다.", transitionOptions: { transitionProperty: "opacity" } })}>모달3 열기</button>
+        <button onClick={() => openModal("modal2", { content: "모달 3", title: "모달창입니다.", subContent: "서브콘텐츠입니다.", transitionOptions: { transitionProperty: "opacity" } })}>모달3 열기</button>
         <button onClick={() => setIsOpen(true)}>모달2 열기</button>
         <button 
-          onClick={() => modal(
+          onClick={() => openModal(
             (props) => (<div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">안녕하세요 반갑습니다.</div>), {
               duration: 5000, 
               backCoverOpacity: 0.3,
