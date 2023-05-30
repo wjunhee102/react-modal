@@ -1,8 +1,8 @@
 import {
+  CloseModal,
   ModalCallbackType,
   ModalDispatchOptions,
 } from "../entities/types";
-import ModalManager from "../services/modalManager";
 
 function setDuration(duration: number) {
   const settedDuration = duration;
@@ -11,39 +11,44 @@ function setDuration(duration: number) {
 }
 
 interface GetCloseModalProps {
-  id: number,
-  options: ModalDispatchOptions,
-  modalManager: ModalManager,
+  id: number;
+  options: ModalDispatchOptions;
+  closeModal: CloseModal;
+  getIsPending: () => boolean;
+  startPending: () => void;
+  endPending: () => void;
 }
 
 export function getCloseModal({
   id,
   options,
-  modalManager,
+  closeModal,
+  getIsPending,
+  startPending,
+  endPending,
 }: GetCloseModalProps): ModalCallbackType {
   const { duration, essentialCallback, essentialCallbackProps } = options;
-  const closeModal = modalManager.remove;
 
   const close = (callback?: ModalCallbackType, props?: any) => {
-    modalManager.startPending();
+    startPending();
 
     essentialCallback && essentialCallback(essentialCallbackProps);
     const removedName = callback && callback(props);
 
     if (!removedName) {
       closeModal(id);
-      modalManager.endPending();
+      endPending();
 
       return;
     }
 
     closeModal([id, removedName]);
-    modalManager.endPending();
+    endPending();
   };
 
   if (duration === undefined) {
     return (callback?: ModalCallbackType, props?: any) => {
-      const isPending = modalManager.getIsPending();
+      const isPending = getIsPending();
 
       if (isPending) {
         return;
@@ -56,7 +61,7 @@ export function getCloseModal({
   const settedDuration = setDuration(duration);
 
   return (callback?: ModalCallbackType, props?: any) => {
-    const isPending = modalManager.getIsPending();
+    const isPending = getIsPending();
     if (isPending) {
       return;
     }

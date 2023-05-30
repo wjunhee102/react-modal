@@ -1,10 +1,10 @@
-import { 
-  DEFAULT_DURATION, 
-  DEFAULT_POSITION, 
-  DEFAULT_TRANSITION, 
-  MODAL_NAME, 
-  MODAL_POSITION, 
-  MODAL_POSITION_STATE
+import {
+  DEFAULT_DURATION,
+  DEFAULT_POSITION,
+  DEFAULT_TRANSITION,
+  MODAL_NAME,
+  MODAL_POSITION,
+  MODAL_POSITION_STATE,
 } from "../contants/constants";
 import {
   ModalListener,
@@ -41,7 +41,7 @@ class ModalManager<T extends string = string> {
   private modalDuration: number = DEFAULT_DURATION;
 
   constructor(
-    baseModalComponentFiber: ModalComponentFiber[] = [], 
+    baseModalComponentFiber: ModalComponentFiber[] = [],
     options: ModalManagerOptionsProps<T> = {}
   ) {
     baseModalComponentFiber.forEach(this.setModalComponentFiberMap);
@@ -52,6 +52,10 @@ class ModalManager<T extends string = string> {
     this.remove = this.remove.bind(this);
     this.edit = this.edit.bind(this);
     this.close = this.close.bind(this);
+
+    this.getIsPending = this.getIsPending.bind(this);
+    this.startPending = this.startPending.bind(this);
+    this.endPending = this.endPending.bind(this);
   }
 
   private setModalComponentFiberMap(componentFiber: ModalComponentFiber) {
@@ -84,11 +88,11 @@ class ModalManager<T extends string = string> {
 
   private initModalOptions(optionsProps: ModalManagerOptionsProps<T>) {
     const { position, transition, duration } = optionsProps;
-  
+
     const initialPosition: ModalPositionTable = {
       ...DEFAULT_POSITION,
       ...position,
-    }
+    };
 
     this.setModalPosition(initialPosition);
     this.setModalTransition(transition);
@@ -100,7 +104,14 @@ class ModalManager<T extends string = string> {
   ): ModalFiber<ModalOptions> {
     const { id, options } = modalFiber;
 
-    const closeModal = getCloseModal({ id, options, modalManager: this });
+    const closeModal = getCloseModal({
+      id,
+      options,
+      closeModal: this.remove,
+      getIsPending: this.getIsPending,
+      startPending: this.startPending,
+      endPending: this.endPending,
+    });
 
     const settedModalFiber: ModalFiber<ModalOptions> = {
       ...modalFiber,
@@ -134,11 +145,14 @@ class ModalManager<T extends string = string> {
     return this.modalFiberStack[this.modalFiberStack.length - 1].id;
   }
 
-  getModalTrainsition(duration: number = -1, options: ModalTransitionOptions = {}): ModalTransition {
+  getModalTrainsition(
+    duration: number = -1,
+    options: ModalTransitionOptions = {}
+  ): ModalTransition {
     if (duration < 0) {
       return {
-        ...this.modalTransition, 
-        ...options
+        ...this.modalTransition,
+        ...options,
       };
     }
 
@@ -148,14 +162,14 @@ class ModalManager<T extends string = string> {
       ...this.modalTransition,
       transitionDuration,
       ...options,
-    }
+    };
   }
 
   getModalPositionMap() {
     return this.modalPositionMap;
   }
 
-  getModalPosition(key: string = MODAL_POSITION.center): ModalPositionStyle{
+  getModalPosition(key: string = MODAL_POSITION.center): ModalPositionStyle {
     const position = this.modalPositionMap.get(key);
 
     if (!position) {
@@ -168,7 +182,7 @@ class ModalManager<T extends string = string> {
   }
 
   getCurrentModalPosition(
-    positionState: ModalPositionState, 
+    positionState: ModalPositionState,
     position: string = MODAL_POSITION.center
   ) {
     const {
@@ -177,30 +191,26 @@ class ModalManager<T extends string = string> {
       final: defautFinal,
     } = this.getModalPosition(MODAL_POSITION.default);
 
-    const {
-      initial,
-      active,
-      final,
-    } = this.getModalPosition(position);
+    const { initial, active, final } = this.getModalPosition(position);
 
     if (positionState === MODAL_POSITION_STATE.initial) {
       return {
         ...defaultInitial,
         ...initial,
-      }
+      };
     }
 
     if (positionState === MODAL_POSITION_STATE.active) {
       return {
         ...defaultActive,
         ...active,
-      }
+      };
     }
 
     return {
       ...defautFinal,
       ...final,
-    }
+    };
   }
 
   setModalTransition(transitionProps?: ModalTransitionProps) {
@@ -211,8 +221,8 @@ class ModalManager<T extends string = string> {
     const transition = {
       ...this.modalTransition,
       ...transitionProps,
-    }
-    
+    };
+
     this.modalTransition = transition;
 
     return this;
@@ -224,7 +234,7 @@ class ModalManager<T extends string = string> {
     }
 
     this.modalDuration = duration;
-    this.setModalTransition({ transitionDuration: `${duration}ms` })
+    this.setModalTransition({ transitionDuration: `${duration}ms` });
 
     return this;
   }
@@ -241,9 +251,9 @@ class ModalManager<T extends string = string> {
 
   setCallCount(command: "add" | "remove") {
     if (command === "add") {
-      this.callCount++;
+      this.callCount += 1;
     } else {
-      this.callCount--;
+      this.callCount -= 1;
     }
 
     return this.callCount;
@@ -252,7 +262,7 @@ class ModalManager<T extends string = string> {
   setIsPending(isPending: boolean) {
     this.isPending = isPending;
     this.notify();
-    
+
     return isPending;
   }
 
@@ -300,13 +310,13 @@ class ModalManager<T extends string = string> {
 
   startPending() {
     this.setIsPending(true);
-    this.callCount++;
+    this.callCount += 1;
 
     return this.callCount;
   }
 
   endPending() {
-    this.callCount--;
+    this.callCount -= 1;
 
     if (this.callCount < 1) {
       this.setIsPending(false);
@@ -319,7 +329,7 @@ class ModalManager<T extends string = string> {
     const listenerProps: ModalListenerProps = {
       modalFiberStack: this.modalFiberStack,
       isPending: this.isPending,
-    }
+    };
 
     this.listeners.forEach((listener) => listener(listenerProps));
   }
@@ -396,22 +406,30 @@ class ModalManager<T extends string = string> {
     this.notify();
   }
 
-  async call<T = any, P = any>(
-    asyncCallback: (props: P) => T, 
+  async call<F = any, P = any>(
+    asyncCallback: (props: P) => F,
     asyncCallbackProps: P
   ) {
     if (typeof asyncCallback !== "function") {
-      throw new Error("modalManager.ts line 372: not function")
+      throw new Error("modalManager.ts line 372: not function");
     }
 
     this.startPending();
 
     try {
       const data = await asyncCallback(asyncCallbackProps);
-    
+
       return data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      if (typeof error === "string") {
+        throw new Error(error);
+      }
+
+      throw new Error("modalManager.ts line 383: not error");
     } finally {
       this.endPending();
     }
