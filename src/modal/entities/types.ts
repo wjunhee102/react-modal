@@ -68,13 +68,13 @@ export interface ModalManagerOptionsProps<T extends string> {
 export type ModalBackCoverCallbackType = "confirm" | "cancel" | "sub" | "none" | "block";
 
 export interface ModalDispatchOptions<T extends string = string> {
-  confirmModalCallback?: (props?: any) => void;
-  cancelModalCallback?: (props?: any) => void;
-  subModalCallback?: (props?: any) => void;
+  confirmCallback?: (props?: any) => void;
+  cancelCallback?: (props?: any) => void;
+  subCallback?: (props?: any) => void;
   essentialCallback?: (props?: any) => void;
-  confirmModalCallbackProps?: any;
-  cancelModalCallbackProps?: any;
-  subModalCallbackProps?: any;
+  confirmCallbackProps?: any;
+  cancelCallbackProps?: any;
+  subCallbackProps?: any;
   essentialCallbackProps?: any;
   backCoverCallbackType?: ModalBackCoverCallbackType;
   backCoverColor?: string;

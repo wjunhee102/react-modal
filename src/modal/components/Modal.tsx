@@ -57,18 +57,18 @@ const Modal = (
 
       case MODAL_CALLBACK_TYPE.cancel:
         return {
-          callback: options.cancelModalCallback,
-          props: options.cancelModalCallbackProps,
+          callback: options.cancelCallback,
+          props: options.cancelCallbackProps,
         };
       case MODAL_CALLBACK_TYPE.confirm:
         return {
-          callback: options.confirmModalCallback,
-          props: options.confirmModalCallbackProps,
+          callback: options.confirmCallback,
+          props: options.confirmCallbackProps,
         };
       case MODAL_CALLBACK_TYPE.sub:
         return {
-          callback: options.subModalCallback,
-          props: options.subModalCallbackProps,
+          callback: options.subCallback,
+          props: options.subCallbackProps,
         };
       default:
         return {
