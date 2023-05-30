@@ -99,7 +99,7 @@ const modalComponentMetaList: ModalMeta[] = [
 ]
 
 const ModalContainer = () => {
-  return <ModalProvider modalComponentMeta={modalComponentMetaList} />;
+  return <ModalProvider modalMeta={modalComponentMetaList} />;
 }
 
 export default ModalContainer;

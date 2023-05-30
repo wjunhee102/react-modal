@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import ModalManager from "../services/modalManager";
-import { ModalComponentFiber, ModalFiber, ModalListener } from "../entities/types";
+import {
+  ModalComponentFiber,
+  ModalFiber,
+  ModalListener,
+  ModalManagerOptionsProps,
+} from "../entities/types";
 import disableBodyScroll from "../utils/disableBodyScroll";
 import Modal from "./Modal";
 
@@ -8,14 +13,16 @@ import "./modal.css";
 
 interface ModalDispatcherProps {
   modalManager?: ModalManager;
-  modalComponentMeta?: ModalComponentFiber | ModalComponentFiber[];
+  modalMeta?: ModalComponentFiber | ModalComponentFiber[];
+  options?: ModalManagerOptionsProps<any>;
   disableScroll?: boolean;
 }
 
 function setModalDispatcher(defaultModalManager: ModalManager) {
   return function ModalDispatcher({
     modalManager = defaultModalManager,
-    modalComponentMeta,
+    modalMeta,
+    options,
     disableScroll = true,
   }: ModalDispatcherProps) {
     const [modalFiberList, setModalFiberList] = useState<ModalFiber[]>([]);
@@ -42,8 +49,12 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
         setIsPending(pending);
       };
 
-      if (modalComponentMeta) {
-        modalManager.setModalComponent(modalComponentMeta);
+      if (modalMeta) {
+        modalManager.setModalComponent(modalMeta);
+      }
+
+      if (options) {
+        modalManager.initModalOptions(options);
       }
 
       modalManager.subscribe(listener);

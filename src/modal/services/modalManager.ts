@@ -86,19 +86,6 @@ class ModalManager<T extends string = string> {
     this.modalComponentFiberMap.set(name, modalComponentFiber);
   }
 
-  private initModalOptions(optionsProps: ModalManagerOptionsProps<T>) {
-    const { position, transition, duration } = optionsProps;
-
-    const initialPosition: ModalPositionTable = {
-      ...DEFAULT_POSITION,
-      ...position,
-    };
-
-    this.setModalPosition(initialPosition);
-    this.setModalTransition(transition);
-    this.setModalDuration(duration);
-  }
-
   private getSettedModalFiber(
     modalFiber: ModalFiber<ModalDispatchOptions>
   ): ModalFiber<ModalOptions> {
@@ -211,6 +198,19 @@ class ModalManager<T extends string = string> {
       ...defautFinal,
       ...final,
     };
+  }
+
+  initModalOptions(optionsProps: ModalManagerOptionsProps<T>) {
+    const { position, transition, duration } = optionsProps;
+
+    const initialPosition: ModalPositionTable = {
+      ...DEFAULT_POSITION,
+      ...position,
+    };
+
+    this.setModalPosition(initialPosition);
+    this.setModalTransition(transition);
+    this.setModalDuration(duration);
   }
 
   setModalTransition(transitionProps?: ModalTransitionProps) {
