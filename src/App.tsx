@@ -19,10 +19,6 @@ function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
 
-  useEffect(() => {
-    setIsOpen2(true);
-  }, []);
-
   return (
     <div className="App">
       <header className="App-header">
@@ -39,8 +35,8 @@ function App() {
           Learn React
         </a>
         <button onClick={() => openModal("modal1", { confirmCallback: () => {
-          openModal("modal2", { duration: 1000, position: "right" });
-        }, duration: 1000 })}>모달 열기</button>
+          openModal("modal2", { duration: 1000, position: "rightBottom-center-leftBottom" });
+        }, duration: 0 })}>모달 열기</button>
         <button 
           onClick={() => {
             openModal(
@@ -51,8 +47,8 @@ function App() {
                 confirmCallback: () => {
                   openModal("modal2", {
                     content: "모달 3", 
-                    position: "active-center", 
-                    duration: 500,
+                    position: "left-center-right", 
+                    duration: 1000,
                   });
                 }
               }

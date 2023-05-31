@@ -29,8 +29,10 @@ export type DefaultModalPosition = "default" |
   "left" | 
   "right" | 
   "center" | 
-  "leftCenterRight" | 
-  "rightCenterLeft"
+  "leftTop" |
+  "leftBottom" |
+  "rightTop" |
+  "rightBottom"
 ;
 
 export interface PositionStyle {

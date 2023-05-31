@@ -57,8 +57,10 @@ export const MODAL_POSITION: {
   bottom: "bottom",
   left: "left",
   right: "right",
-  leftCenterRight: "leftCenterRight",
-  rightCenterLeft: "rightCenterLeft",
+  leftTop: "leftTop",
+  leftBottom: "leftBottom",
+  rightTop: "rightTop",
+  rightBottom: "rightBottom",
 }
 
 export const DEFAULT_POSITION: ModalPositionTable = {
@@ -113,18 +115,18 @@ export const DEFAULT_POSITION: ModalPositionTable = {
   [MODAL_POSITION.bottom]: {
     [MODAL_POSITION_STATE.initial]: {
       left: "50%",
-      bottom: "0",
-      transform: "translate(-50%, 100%)"
+      top: "100%",
+      transform: "translate(-50%, 0)"
     },
     [MODAL_POSITION_STATE.active]: {
       left: "50%",
-      bottom: "0",
-      transform: "translate(-50%, 0)",
+      top: "100%",
+      transform: "translate(-50%, -100%)",
     },
     [MODAL_POSITION_STATE.final]: {
       left: "50%",
-      bottom: "0",
-      transform: "translate(-50%, 100%)",
+      top: "100%",
+      transform: "translate(-50%, 0)",
     }
   },
   [MODAL_POSITION.top]: {
@@ -163,70 +165,87 @@ export const DEFAULT_POSITION: ModalPositionTable = {
   },
   [MODAL_POSITION.right]: {
     [MODAL_POSITION_STATE.initial]: {
-      right: "0",
-      top: "50%",
-      transform: "translate(100%, -50%)",
-    },
-    [MODAL_POSITION_STATE.active]: {
-      right: "0",
+      left: "100%",
       top: "50%",
       transform: "translate(0, -50%)",
     },
-    [MODAL_POSITION_STATE.final]: {
-      right: "0",
+    [MODAL_POSITION_STATE.active]: {
+      left: "100%",
       top: "50%",
-      transform: "translate(100%, -50%)",
+      transform: "translate(-100%, -50%)",
+    },
+    [MODAL_POSITION_STATE.final]: {
+      left: "100%",
+      top: "50%",
+      transform: "translate(0, -50%)",
     }
   },
-  leftCenterRight: {
+  [MODAL_POSITION.leftTop]: {
     [MODAL_POSITION_STATE.initial]: {
       left: "0",
-      top: "50%",
-      transform: "translate(-100%, -50%) scale(0)"
-    },
-    [MODAL_POSITION_STATE.active]: {
-      left: "50%",
-      top: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    [MODAL_POSITION_STATE.final]: {
-      right: "0",
-      top: "50%",
-      transform: "translate(100%, -50%) scale(0)",
-    }
-  },
-  rightCenterLeft: {
-    [MODAL_POSITION_STATE.initial]: {
-      right: "0",
-      top: "50%",
-      transform: "translate(100%, -50%) scale(1)",
-    }, 
-    [MODAL_POSITION_STATE.active]: {
-      left: "50%",
-      top: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
-    },
-    [MODAL_POSITION_STATE.final]: {
-      left: "0",
-      top: "50%",
-      transform: "translate(-100%, -50%) scale(1)"
-    }
-  },
-  topCenterBottom: {
-    [MODAL_POSITION_STATE.initial]: {
       top: "0",
-      left: "50%",
-      transform: "translate(-50%, 0%) scale(1)",
-    }, 
+      transform: "translate(-100%, -100%) scale(0)"
+    },
     [MODAL_POSITION_STATE.active]: {
-      left: "50%",
-      top: "50%",
-      transform: "translate(-50%, -50%) scale(1)",
+      left: "0",
+      top: "0",
+      transform: "translate(0, 0) scale(1)",
     },
     [MODAL_POSITION_STATE.final]: {
       left: "0",
-      top: "50%",
-      transform: "translate(-100%, -50%) scale(1)"
+      top: "0",
+      transform: "translate(-100%, -100%) scale(0)",
+    }
+  },
+  [MODAL_POSITION.leftBottom]: {
+    [MODAL_POSITION_STATE.initial]: {
+      left: "0",
+      top: "100%",
+      transform: "translate(-100%, 0) scale(0)"
+    },
+    [MODAL_POSITION_STATE.active]: {
+      left: "0",
+      top: "100%",
+      transform: "translate(0, -100%) scale(1)",
+    },
+    [MODAL_POSITION_STATE.final]: {
+      left: "0",
+      top: "100%",
+      transform: "translate(-100%, 0) scale(0)",
+    }
+  },
+  [MODAL_POSITION.rightTop]: {
+    [MODAL_POSITION_STATE.initial]: {
+      left: "100%",
+      top: "0",
+      transform: "translate(0, -100%) scale(0)"
+    },
+    [MODAL_POSITION_STATE.active]: {
+      left: "100%",
+      top: "0",
+      transform: "translate(-100%, 0) scale(1)",
+    },
+    [MODAL_POSITION_STATE.final]: {
+      left: "100%",
+      top: "0",
+      transform: "translate(0, -100%) scale(0)",
+    }
+  },
+  [MODAL_POSITION.rightBottom]: {
+    [MODAL_POSITION_STATE.initial]: {
+      left: "100%",
+      top: "100%",
+      transform: "translate(0, 0) scale(0)"
+    },
+    [MODAL_POSITION_STATE.active]: {
+      left: "100%",
+      top: "100%",
+      transform: "translate(-100%, -100%) scale(1)",
+    },
+    [MODAL_POSITION_STATE.final]: {
+      left: "100%",
+      top: "100%",
+      transform: "translate(0, 0) scale(0)",
     }
   }
 }
