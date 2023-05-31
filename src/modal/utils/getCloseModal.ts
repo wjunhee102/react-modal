@@ -5,9 +5,9 @@ import {
 import ModalManager from "../services/modalManager";
 
 function setDuration(duration: number) {
-  const settedDuration = duration;
+  const appliedDuration = duration;
 
-  return settedDuration < 0 ? 0 : settedDuration;
+  return appliedDuration < 0 ? 0 : appliedDuration;
 }
 
 interface GetCloseModalProps {
@@ -53,7 +53,7 @@ export function getCloseModal({
     };
   }
 
-  const settedDuration = setDuration(duration);
+  const appliedDuration = setDuration(duration);
 
   return (callback?: ModalCallbackType, props?: any) => {
     const isPending = modalManager.getIsPending();
@@ -68,6 +68,6 @@ export function getCloseModal({
 
     setTimeout(() => {
       close(callback, props);
-    }, settedDuration);
+    }, appliedDuration);
   };
 }
