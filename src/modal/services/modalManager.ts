@@ -107,6 +107,7 @@ class ModalManager<T extends string = string> {
         ...modalFiber.options,
         closeModal,
         call: this.call,
+        positionState: MODAL_POSITION_STATE.initial,
       },
     };
 

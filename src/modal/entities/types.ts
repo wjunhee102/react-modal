@@ -104,6 +104,7 @@ export type ModalAsyncCall<T = any, P = any> = (asyncCallback: (props: P) => T, 
 export interface ModalOptions<T extends string = string> extends EditModalOptionsProps<T> {
   closeModal: (callback?: ModalCallbackType, props?: any) => void;
   call: ModalAsyncCall;
+  positionState: ModalPositionState;
 }
 
 export type CloseModalProps =
