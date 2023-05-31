@@ -20,8 +20,8 @@ const setModalRegistrator = (defaultModalManager: ModalManager) =>
     modalManager = defaultModalManager,
     options = {},
   }: ModalRegistratorProps) {
-    const [modalId, setModalId] = useState<number>(-1);
-    const [currentName, setCurrentName] = useState<string>("");
+    const [modalId, setModalId] = useState(-1);
+    const [currentName, setCurrentName] = useState("");
 
     const essentialCallback = (props?: any) => {
       setOpen && setOpen(false);

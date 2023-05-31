@@ -95,11 +95,11 @@ const Modal = (
       position, 
     } = options;
 
-    const settedPosition =
+    const appliedPosition =
       typeof position === "function" ? position(breakPoint) : position;
     
     const backCoverStyle = modalManager.getCurrentModalPosition(positionState, MODAL_POSITION.backCover);
-    const modalStyle = modalManager.getCurrentModalPosition(positionState, settedPosition);
+    const modalStyle = modalManager.getCurrentModalPosition(positionState, appliedPosition);
     const transition = modalManager.getModalTrainsition(duration, transitionOptions);
     const isActiveState = positionState === MODAL_POSITION_STATE.active;
 
