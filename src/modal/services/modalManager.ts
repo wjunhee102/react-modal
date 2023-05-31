@@ -28,6 +28,7 @@ import {
 } from "../entities/types";
 import { checkDefaultModalName } from "../utils/checkDefaultModalName";
 import { getCloseModal } from "../utils/getCloseModal";
+import { getPositionKey } from "../utils/getPositionKey";
 
 class ModalManager<T extends string = string> {
   private currentId: number = 0;
@@ -172,22 +173,34 @@ class ModalManager<T extends string = string> {
     positionState: ModalPositionState,
     position: string = MODAL_POSITION.center
   ) {
+    let state: ModalPositionState = positionState;
+    let key: string = position;
+
+    const positionKey = getPositionKey(position, state);
+
+    if (Array.isArray(positionKey)) {
+      state = positionKey[0];
+      key = positionKey[1];
+    } else {
+      key = positionKey;
+    }
+
     const {
       initial: defaultInitial,
       active: defaultActive,
       final: defautFinal,
     } = this.getModalPosition(MODAL_POSITION.default);
 
-    const { initial, active, final } = this.getModalPosition(position);
+    const { initial, active, final } = this.getModalPosition(key);
 
-    if (positionState === MODAL_POSITION_STATE.initial) {
+    if (state === MODAL_POSITION_STATE.initial) {
       return {
         ...defaultInitial,
         ...initial,
       };
     }
 
-    if (positionState === MODAL_POSITION_STATE.active) {
+    if (state === MODAL_POSITION_STATE.active) {
       return {
         ...defaultActive,
         ...active,

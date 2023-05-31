@@ -51,7 +51,7 @@ function App() {
                 confirmCallback: () => {
                   openModal("modal2", {
                     content: "모달 3", 
-                    position: "topCenterBottom", 
+                    position: "active-center", 
                     duration: 500,
                   });
                 }
@@ -105,6 +105,7 @@ function App() {
           }
         </Modal>
       </header>
+      <div className='w-full h-[500px]'></div>
     </div>
   );
 }

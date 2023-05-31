@@ -1,4 +1,4 @@
-import { modal } from "./modal";
+import { openModal } from "./modal";
 
 function delay(time: number) {
   return new Promise((resolve) => {
@@ -12,7 +12,7 @@ export async function api() {
   const result: any = await delay(5000);
 
   if (!result) {
-    modal(() => {
+    openModal(() => {
       return (
         <div>
           sadsadsadd

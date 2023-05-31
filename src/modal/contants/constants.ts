@@ -41,6 +41,12 @@ export const MODAL_POSITION_STATE: {
   final: "final",
 }
 
+export const MODAL_POSITION_STATE_LIST: string[] = [
+  MODAL_POSITION_STATE.initial,
+  MODAL_POSITION_STATE.active,
+  MODAL_POSITION_STATE.final,
+]
+
 export const MODAL_POSITION: {
   [key in DefaultModalPosition]: key;
 } = {
