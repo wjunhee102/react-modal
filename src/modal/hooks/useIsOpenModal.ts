@@ -4,7 +4,7 @@ import { ModalListener } from "../entities/types";
 
 function setUseIsOpenModal(defaultModalManager: ModalManager) {
   return (modalManager: ModalManager = defaultModalManager) => {
-    const [isOpenModal, setIsOpen] = useState<boolean>(false);
+    const [isOpenModal, setIsOpen] = useState(false);
 
     useEffect(() => {
       const listener: ModalListener = ({
