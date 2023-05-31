@@ -24,7 +24,7 @@ export const MODAL_CALLBACK_TYPE: {
   block: "block",
 }
 
-export const DEFAULT_DURATION = 400;
+export const DEFAULT_DURATION = 300;
 
 export const DEFAULT_TRANSITION: ModalTransition = {
   transitionProperty: "opacity, transform, left, top, bottom, right, background, background-color",
