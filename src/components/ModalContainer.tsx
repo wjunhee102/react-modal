@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ModalFC, ModalMeta, ModalProvider } from "../modal";
+import { ModalCancelButton, ModalConfirmButton, ModalFC, ModalMeta, ModalProvider } from "../modal";
 
 function delay(time: number) {
   console.log("delay");
@@ -11,16 +11,10 @@ function delay(time: number) {
 } 
 
 const Modal1: ModalFC = ({ 
-  closeModal, 
-  content,
   call,
 }) => {
   const [isLoading, setLoading] = useState(false);
   const [isSuccess, setSuccess] = useState(false);
-
-  const onClickClose = () => {
-    closeModal();
-  }
 
   const onClickCallApi = async () => {
     setLoading(true);
@@ -29,18 +23,6 @@ const Modal1: ModalFC = ({
     // const result: boolean = await delay(2000) as boolean;
 
     setSuccess(result);
-  }
-
-  const onClickConfirm = async () => {
-    // console.log("onClickConfirm");
-    // setLoading(true);
-
-    // // const result: boolean = await call(delay, 2000) as boolean;
-    // const result: boolean = await delay(2000) as boolean;
-
-    // setSuccess(result);
-
-    closeModal(true);
   }
   
   return (
@@ -56,9 +38,11 @@ const Modal1: ModalFC = ({
         }
       </div>
       <div className="flex items-center justify-between h-full px-4">
-        <button onClick={onClickClose}>Close</button>
+        <ModalCancelButton>Close</ModalCancelButton>
         <button onClick={onClickCallApi}>Api</button>
-        <button onClick={onClickConfirm}>Confirm</button>
+        <ModalConfirmButton>
+          Confirm
+        </ModalConfirmButton>
       </div>
     </div>
   )

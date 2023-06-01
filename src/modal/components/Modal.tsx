@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import ModalManager from "../services/modalManager";
+import ModalContext from "../services/modalContext";
 import {
   ModalActionType,
   ModalFiber,
@@ -151,7 +152,9 @@ const Modal = ({
       </button>
       <div className="modalContentContainer-r">
         <div className="modalContent-r" style={modalStyle}>
-          <Component {...modalOptions} />
+          <ModalContext.Provider value={modalOptions}>
+            <Component {...modalOptions} />
+          </ModalContext.Provider>
         </div>
       </div>
     </div>

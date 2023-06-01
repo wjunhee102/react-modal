@@ -34,9 +34,27 @@ function App() {
         >
           Learn React
         </a>
-        <button onClick={() => openModal("modal1", { callback: () => {
-          openModal("modal2", { duration: 1000, position: "rightBottom-center-leftBottom" });
-        }, duration: 0 })}>모달 열기</button>
+        <button 
+          onClick={
+            () => openModal("modal1", 
+            { 
+              callback: (actionType) => {
+                if (actionType === true) {
+                  openModal("modal2", { 
+                    duration: 1000, 
+                    position: "rightBottom-center-leftBottom" 
+                  });
+                } else if (actionType === false) {
+                  openModal("modal2", { 
+                    duration: 1000, 
+                    position: "leftBottom-center-rightBottom" 
+                  });
+                }
+              },
+              duration: 0 
+            })
+          }
+          >모달 열기</button>
         <button 
           onClick={() => {
             openModal(

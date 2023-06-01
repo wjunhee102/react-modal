@@ -4,7 +4,6 @@ import {
   ModalPositionTable, 
   ModalPositionState, 
   ModalTransition,
-  ModalBackCoverCallbackType,
 } from "../entities/types";
 
 export const MODAL_NAME: {
@@ -13,16 +12,6 @@ export const MODAL_NAME: {
   clear: "clear",
   unknown: "unknown",
 };
-
-export const MODAL_CALLBACK_TYPE: {
-  [key in ModalBackCoverCallbackType]: key;
-} = {
-  none: "none",
-  confirm: "confirm",
-  cancel: "cancel",
-  sub: "sub",
-  block: "block",
-}
 
 export const DEFAULT_DURATION = 300;
 
