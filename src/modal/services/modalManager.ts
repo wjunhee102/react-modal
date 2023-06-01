@@ -80,7 +80,7 @@ class ModalManager<T extends string = string> {
       defaultOptions: {
         ...defaultOptions,
         duration: defaultOptions?.duration || this.modalDuration,
-        coverCallbackType: defaultOptions?.backCoverCallbackType ?? "cancel",
+        backCoverActionType: defaultOptions?.backCoverActionType ?? false,
       },
     };
 
@@ -214,7 +214,7 @@ class ModalManager<T extends string = string> {
     };
   }
 
-  initModalOptions(optionsProps: ModalManagerOptionsProps<T>) {
+  public initModalOptions(optionsProps: ModalManagerOptionsProps<T>) {
     const { position, transition, duration } = optionsProps;
 
     const initialPosition: ModalPositionTable = {

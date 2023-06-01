@@ -5,7 +5,8 @@ import setDispatcher from "./components/ModalDispatcher";
 import setUseIsOpen from "./hooks/useIsOpenModal";
 import {
   ModalOptions as Options,
-  ModalCallbackType as CallbackType,
+  ModalCallback as Callback,
+  ModalActionType as ActionType,
   ModalComponent as Component,
   ModalComponentFiber as ComponentFiber,
 } from "./entities/types";
@@ -25,7 +26,8 @@ export const openModal = modalController.open;
 export const closeModal = modalController.close;
 
 export type ModalOptions = Options;
-export type ModalCallbackType = CallbackType;
+export type ModalCallback = Callback;
+export type ModalActionType = ActionType;
 export type ModalFC = Component;
 export type ModalMeta = ComponentFiber;
 

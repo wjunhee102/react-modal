@@ -12,8 +12,6 @@ function delay(time: number) {
 
 const Modal1: ModalFC = ({ 
   closeModal, 
-  confirmCallback, 
-  confirmCallbackProps, 
   content,
   call,
 }) => {
@@ -42,7 +40,7 @@ const Modal1: ModalFC = ({
 
     // setSuccess(result);
 
-    closeModal(confirmCallback);
+    closeModal(true);
   }
   
   return (
@@ -81,7 +79,6 @@ const modalComponentMetaList: ModalMeta[] = [
     defaultOptions: {
       duration: 400,
       position: (breackPoint) => breackPoint > 500 ? "center" : "bottom",
-      backCoverCallbackType: "none"
     }
   },
   {

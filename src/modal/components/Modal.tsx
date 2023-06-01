@@ -1,16 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ModalManager from "../services/modalManager";
-import { 
-  ModalCallbackType, 
-  ModalFiber, 
-  ModalOptions, 
-  ModalPositionState 
+import {
+  ModalActionType,
+  ModalFiber,
+  ModalOptions,
+  ModalPositionState,
 } from "../entities/types";
-import { 
-  MODAL_CALLBACK_TYPE, 
-  MODAL_POSITION, 
-  MODAL_POSITION_STATE 
-} from "../contants/constants";
+import { MODAL_POSITION, MODAL_POSITION_STATE } from "../contants/constants";
 import { delay } from "../utils/delay";
 
 interface ModalProps extends ModalFiber {
@@ -19,66 +15,35 @@ interface ModalProps extends ModalFiber {
   isPending: boolean;
 }
 
-const Modal = (
-  { 
-    modalManager, 
-    breakPoint, 
-    isPending,
-    options, 
-    component: Component 
-  }: ModalProps
-) => {
-  const [positionState, setPositionState] = useState<ModalPositionState>(MODAL_POSITION_STATE.initial);
+const Modal = ({
+  modalManager,
+  breakPoint,
+  isPending,
+  options,
+  component: Component,
+}: ModalProps) => {
+  const [positionState, setPositionState] = useState<ModalPositionState>(
+    MODAL_POSITION_STATE.initial
+  );
 
-  const { isClose } = options;
+  const { isClose, backCoverActionType } = options;
 
   const isActive = positionState === MODAL_POSITION_STATE.active;
 
   const modalOptions: ModalOptions = useMemo(
     () => ({
       ...options,
-      closeModal: (callback?: ModalCallbackType, props?: any) => {
+      closeModal: (actionType?: ModalActionType) => {
         if (isPending) {
           return;
         }
         setPositionState(MODAL_POSITION_STATE.final);
-        options.closeModal(callback, props);
+        options.closeModal(actionType);
       },
       positionState,
     }),
     [options, isPending, positionState]
   );
-
-  const backCoverCallback = useMemo(() => {
-    const { backCoverCallbackType } = options;
-
-    switch (backCoverCallbackType) {
-      case MODAL_CALLBACK_TYPE.block:
-        return undefined;
-
-      case MODAL_CALLBACK_TYPE.cancel:
-        return {
-          callback: options.cancelCallback,
-          props: options.cancelCallbackProps,
-        };
-      case MODAL_CALLBACK_TYPE.confirm:
-        return {
-          callback: options.confirmCallback,
-          props: options.confirmCallbackProps,
-        };
-      case MODAL_CALLBACK_TYPE.sub:
-        return {
-          callback: options.subCallback,
-          props: options.subCallbackProps,
-        };
-      default:
-        return {
-          // eslint-disable-next-line
-          callback: () => {},
-          props: {},
-        };
-    }
-  }, [options]);
 
   const {
     modalStyle,
@@ -87,54 +52,54 @@ const Modal = (
     modalStyle: React.CSSProperties;
     backCoverStyle: React.CSSProperties;
   } = useMemo(() => {
-    const { 
-      backCoverColor, 
-      backCoverOpacity, 
-      duration, 
-      transitionOptions, 
-      position, 
+    const {
+      backCoverColor,
+      backCoverOpacity,
+      duration,
+      transitionOptions,
+      position,
     } = options;
 
-    const appliedPosition =
+    const settedPosition =
       typeof position === "function" ? position(breakPoint) : position;
-    
-    const backCoverStyle = modalManager.getCurrentModalPosition(positionState, MODAL_POSITION.backCover);
-    const modalStyle = modalManager.getCurrentModalPosition(positionState, appliedPosition);
-    const transition = modalManager.getModalTrainsition(duration, transitionOptions);
+
+    const backCoverPosition = modalManager.getCurrentModalPosition(
+      positionState,
+      MODAL_POSITION.backCover
+    );
+    const modalPosition = modalManager.getCurrentModalPosition(
+      positionState,
+      settedPosition
+    );
+    const transition = modalManager.getModalTrainsition(
+      duration,
+      transitionOptions
+    );
     const isActiveState = positionState === MODAL_POSITION_STATE.active;
 
     return {
       modalStyle: {
         pointerEvents: isActiveState ? "auto" : "none",
         ...transition,
-        ...modalStyle,
+        ...modalPosition,
       },
       backCoverStyle: {
         cursor: isActiveState ? "pointer" : "default",
         ...transition,
-        ...backCoverStyle,
-        background: (isActiveState && backCoverColor) || backCoverStyle.background,
-        opacity: (isActiveState && backCoverOpacity) || backCoverStyle.opacity,
-      }
-    }
-  }, [
-    options, 
-    modalManager, 
-    breakPoint, 
-    positionState
-  ]);
+        ...backCoverPosition,
+        background:
+          (isActiveState && backCoverColor) || backCoverPosition.background,
+        opacity:
+          (isActiveState && backCoverOpacity) || backCoverPosition.opacity,
+      },
+    };
+  }, [options, modalManager, breakPoint, positionState]);
 
   const onCloseModal = () => {
-    if (
-      isPending || 
-      !backCoverCallback || 
-      modalManager.getIsPending()
-    ) {
+    if (isPending || modalManager.getIsPending()) {
       return;
     }
-    const { callback, props } = backCoverCallback;
-
-    modalOptions.closeModal(callback, props);
+    modalOptions.closeModal(backCoverActionType);
   };
 
   useEffect(() => {
@@ -161,10 +126,7 @@ const Modal = (
       return;
     }
 
-    const {
-      duration,
-      call,
-    } = options;
+    const { duration, call } = options;
 
     call(delay, duration ?? 0);
     // eslint-disable-next-line
@@ -188,10 +150,7 @@ const Modal = (
         {" "}
       </button>
       <div className="modalContentContainer-r">
-        <div
-          className="modalContent-r"
-          style={modalStyle}
-        >
+        <div className="modalContent-r" style={modalStyle}>
           <Component {...modalOptions} />
         </div>
       </div>

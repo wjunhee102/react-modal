@@ -3,9 +3,7 @@ export interface ModalListenerProps {
   isPending: boolean;
 }
 
-export type ModalListener = (
-  listenerProps: ModalListenerProps
-) => void;
+export type ModalListener = (listenerProps: ModalListenerProps) => void;
 
 export type DefaultModalName = "clear" | "unknown";
 
@@ -20,20 +18,18 @@ export interface ModalTransition {
 
 export type ModalTransitionProps = {
   [key in keyof ModalTransition]?: ModalTransition[key];
-}
+};
 
-export type DefaultModalPosition = "default" | 
-  "backCover" |
-  "bottom" | 
-  "top" | 
-  "left" | 
-  "right" | 
-  "center" | 
-  "leftTop" |
-  "leftBottom" |
-  "rightTop" |
-  "rightBottom"
-;
+export type DefaultModalPosition =
+  | "default"
+  | "backCover"
+  | "bottom"
+  | "top"
+  | "left"
+  | "right"
+  | "center"
+  | "leftCenterRight"
+  | "rightCenterLeft";
 
 export interface PositionStyle {
   left?: string;
@@ -49,15 +45,21 @@ export type ModalPositionState = "initial" | "active" | "final";
 
 export type ModalPositionStyle = {
   [key in ModalPositionState]: PositionStyle;
-}
+};
 
 export type ModalPositionTable<T extends string = string> = {
-  [key in (DefaultModalPosition | T)]: ModalPositionStyle;
-}
+  [key in DefaultModalPosition | T]: ModalPositionStyle;
+};
 
-export type ModalPositionMap<T extends string = string> = Map<T | DefaultModalPosition, ModalPositionStyle>;
+export type ModalPositionMap<T extends string = string> = Map<
+  T | DefaultModalPosition,
+  ModalPositionStyle
+>;
 
-export type ModalTransitionOptions = Omit<ModalTransitionProps, "transitionDuration">;
+export type ModalTransitionOptions = Omit<
+  ModalTransitionProps,
+  "transitionDuration"
+>;
 
 export interface ModalManagerOptionsProps<T extends string> {
   position?: ModalPositionTable<T>;
@@ -67,18 +69,15 @@ export interface ModalManagerOptionsProps<T extends string> {
   backCoverOpacity?: number;
 }
 
-export type ModalBackCoverCallbackType = "confirm" | "cancel" | "sub" | "none" | "block";
+export type ModalActionType = boolean | string | null;
+
+export type ModalCallback = (
+  actionsType?: ModalActionType
+) => void | undefined | ModalRemovedName | string;
 
 export interface ModalDispatchOptions<T extends string = string> {
-  confirmCallback?: (props?: any) => void;
-  cancelCallback?: (props?: any) => void;
-  subCallback?: (props?: any) => void;
-  essentialCallback?: (props?: any) => void;
-  confirmCallbackProps?: any;
-  cancelCallbackProps?: any;
-  subCallbackProps?: any;
-  essentialCallbackProps?: any;
-  backCoverCallbackType?: ModalBackCoverCallbackType;
+  callback?: ModalCallback;
+  backCoverActionType?: ModalActionType;
   backCoverColor?: string;
   backCoverOpacity?: number;
   title?: React.ReactNode | React.ReactElement;
@@ -89,22 +88,26 @@ export interface ModalDispatchOptions<T extends string = string> {
   payload?: any;
   duration?: number;
   transitionOptions?: ModalTransitionOptions;
-  position?: ((breakPoint: number) => DefaultModalPosition | T) | DefaultModalPosition | T;
+  position?:
+    | ((breakPoint: number) => DefaultModalPosition | T)
+    | DefaultModalPosition
+    | T;
   required?: boolean;
 }
 
-export type ModalCallbackType = (
-  payload?: any
-) => void | undefined | ModalRemovedName | string;
-
-export interface EditModalOptionsProps<T extends string = string> extends ModalDispatchOptions<T> {
+export interface EditModalOptionsProps<T extends string = string>
+  extends ModalDispatchOptions<T> {
   isClose?: boolean;
 }
 
-export type ModalAsyncCall<T = any, P = any> = (asyncCallback: (props: P) => T, asyncCallbackProps: P) => Promise<T>;
+export type ModalAsyncCall<T = any, P = any> = (
+  asyncCallback: (props: P) => T,
+  asyncCallbackProps: P
+) => Promise<T>;
 
-export interface ModalOptions<T extends string = string> extends EditModalOptionsProps<T> {
-  closeModal: (callback?: ModalCallbackType, props?: any) => void;
+export interface ModalOptions<T extends string = string>
+  extends EditModalOptionsProps<T> {
+  closeModal: (actionType?: ModalActionType) => void;
   call: ModalAsyncCall;
   positionState: ModalPositionState;
 }

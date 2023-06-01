@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { ModalDispatchOptions, ModalOptions } from "../entities/types";
+import {
+  ModalCallback,
+  ModalDispatchOptions,
+  ModalOptions,
+} from "../entities/types";
 import ModalManager from "../services/modalManager";
 
 interface ModalRegistratorProps {
@@ -20,17 +24,17 @@ const setModalRegistrator = (defaultModalManager: ModalManager) =>
     modalManager = defaultModalManager,
     options = {},
   }: ModalRegistratorProps) {
-    const [modalId, setModalId] = useState(-1);
-    const [currentName, setCurrentName] = useState("");
+    const [modalId, setModalId] = useState<number>(-1);
+    const [currentName, setCurrentName] = useState<string>("");
 
-    const essentialCallback = (props?: any) => {
+    const callback: ModalCallback = (actionType) => {
       setOpen && setOpen(false);
-      options && options.essentialCallback && options.essentialCallback(props);
+      options.callback && options.callback(actionType);
     };
 
     const modalOptions = {
       ...options,
-      essentialCallback,
+      callback,
     };
 
     if (name) {
