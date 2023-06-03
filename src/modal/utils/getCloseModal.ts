@@ -5,9 +5,9 @@ import {
 } from "../entities/types";
 
 function setDuration(duration: number) {
-  const settedDuration = duration;
+  const appliedDuration = duration;
 
-  return settedDuration < 0 ? 0 : settedDuration;
+  return appliedDuration < 0 ? 0 : appliedDuration;
 }
 
 interface GetCloseModalProps {
@@ -57,7 +57,7 @@ export function getCloseModal({
     };
   }
 
-  const settedDuration = setDuration(duration);
+  const appliedDuration = setDuration(duration);
 
   return (actionType) => {
     const isPending = getIsPending();
@@ -72,6 +72,6 @@ export function getCloseModal({
 
     setTimeout(() => {
       close(actionType);
-    }, settedDuration);
+    }, appliedDuration);
   };
 }

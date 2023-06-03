@@ -87,7 +87,7 @@ class ModalManager<T extends string = string> {
     this.modalComponentFiberMap.set(name, modalComponentFiber);
   }
 
-  private getSettedModalFiber(
+  private getAppliedModalFiber(
     modalFiber: ModalFiber<ModalDispatchOptions>
   ): ModalFiber<ModalOptions> {
     const { id, options } = modalFiber;
@@ -101,7 +101,7 @@ class ModalManager<T extends string = string> {
       endPending: this.endPending,
     });
 
-    const settedModalFiber: ModalFiber<ModalOptions> = {
+    const appliedModalFiber: ModalFiber<ModalOptions> = {
       ...modalFiber,
       options: {
         ...modalFiber.options,
@@ -111,7 +111,7 @@ class ModalManager<T extends string = string> {
       },
     };
 
-    return settedModalFiber;
+    return appliedModalFiber;
   }
 
   getCallCount() {
@@ -371,17 +371,17 @@ class ModalManager<T extends string = string> {
       | ModalFiber<ModalDispatchOptions>
       | ModalFiber<ModalDispatchOptions>[]
   ) {
-    let settedModalFiberStack: ModalFiber<ModalOptions>[];
+    let appliedModalFiberStack: ModalFiber<ModalOptions>[];
 
     if (Array.isArray(modalFiber)) {
-      settedModalFiberStack = modalFiber.map((fiber) =>
-        this.getSettedModalFiber(fiber)
+      appliedModalFiberStack = modalFiber.map((fiber) =>
+        this.getAppliedModalFiber(fiber)
       );
     } else {
-      settedModalFiberStack = [this.getSettedModalFiber(modalFiber)];
+      appliedModalFiberStack = [this.getAppliedModalFiber(modalFiber)];
     }
 
-    this.modalFiberStack = [...this.modalFiberStack, ...settedModalFiberStack];
+    this.modalFiberStack = [...this.modalFiberStack, ...appliedModalFiberStack];
 
     this.notify();
   }

@@ -61,7 +61,7 @@ const Modal = ({
       position,
     } = options;
 
-    const settedPosition =
+    const appliedPosition =
       typeof position === "function" ? position(breakPoint) : position;
 
     const backCoverPosition = modalManager.getCurrentModalPosition(
@@ -70,7 +70,7 @@ const Modal = ({
     );
     const modalPosition = modalManager.getCurrentModalPosition(
       positionState,
-      settedPosition
+      appliedPosition
     );
     const transition = modalManager.getModalTrainsition(
       duration,
