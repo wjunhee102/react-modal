@@ -28,7 +28,7 @@ const Modal1: ModalFC = ({
   return (
     <div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">
       <div>
-        {/* {content} 모달창창입니다. */}
+        {/* {content} 모달창입니다. */}
         모달
         {
           isLoading && "로딩중입니다."
@@ -62,7 +62,7 @@ const modalComponentMetaList: ModalMeta[] = [
     component: Modal1,
     defaultOptions: {
       duration: 400,
-      position: (breackPoint) => breackPoint > 500 ? "center" : "bottom",
+      position: (breakPoint) => breakPoint > 500 ? "center" : "bottom",
     }
   },
   {
@@ -70,7 +70,7 @@ const modalComponentMetaList: ModalMeta[] = [
     component: Modal1
   },
   {
-    name: "pendding",
+    name: "pending",
     component: Modal1
   },
   {
