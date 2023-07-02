@@ -1,14 +1,15 @@
 import { ButtonHTMLAttributes, MouseEvent } from "react";
 import useModalOptions from "../hooks/useModalOptions";
+import { ModalConfirmType } from "../services/modalStateManager";
 
 interface ModalSubButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  actionType: string;
+  confirmType: ModalConfirmType;
 }
 
 const ModalSubButton = ({
   onClick,
   children,
-  actionType,
+  confirmType,
   ...restProps
 }: ModalSubButtonProps) => {
   const options = useModalOptions();
@@ -17,16 +18,16 @@ const ModalSubButton = ({
     return null;
   }
 
-  const { closeModal, subContent } = options;
+  const { action, subBtnContent } = options;
 
   const onClickSub = (e: MouseEvent<HTMLButtonElement>) => {
     onClick && onClick(e);
-    closeModal(actionType);
+    action(confirmType);
   };
 
   return (
     <button {...restProps} onClick={onClickSub} type="button">
-      {subContent || children || "서브"}
+      {subBtnContent || children || "서브"}
     </button>
   );
 };

@@ -1,9 +1,9 @@
-import { openModal } from "./modal";
+import { openModal } from "./modal-pre";
 
 function delay(time: number) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(false);
+      resolve(true);
     }, time);
   })
 } 
@@ -20,4 +20,6 @@ export async function api() {
       )
     }, { content: "api error", position: "top"})
   }
+
+  return true;
 }

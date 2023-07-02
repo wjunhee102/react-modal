@@ -4,7 +4,7 @@ import {
   DEFAULT_TRANSITION,
   MODAL_NAME,
   MODAL_POSITION,
-  MODAL_POSITION_STATE,
+  MODAL_TRANSACTION_STATE,
 } from "../contants/constants";
 import {
   ModalListener,
@@ -23,17 +23,25 @@ import {
   ModalTransitionProps,
   ModalPositionStyle,
   ModalTransitionOptions,
-  ModalPositionState,
   ModalListenerProps,
-} from "../entities/types";
+  ModalTransactionState,
+} from "../types";
 import { checkDefaultModalName } from "../utils/checkDefaultModalName";
+import { defaultMiddleware } from "../utils/defaultMiddleware";
 import { getCloseModal } from "../utils/getCloseModal";
 import { getPositionKey } from "../utils/getPositionKey";
+import {
+  ModalStateManager,
+  ModalLifecycleState,
+  MODAL_LIFECYCLE_STATE,
+  ModalStateProps,
+} from "./modalStateManager";
 
 class ModalManager<T extends string = string> {
   private currentId: number = 0;
   private callCount: number = 0;
-  private isPending: boolean = false;
+  private transactionState: ModalTransactionState =
+    MODAL_TRANSACTION_STATE.idle;
   private modalFiberStack: ModalFiber[] = [];
   private listeners: ModalListener[] = [];
   private modalComponentFiberMap: Map<string, ModalComponentFiber> = new Map();
@@ -54,9 +62,10 @@ class ModalManager<T extends string = string> {
     this.edit = this.edit.bind(this);
     this.close = this.close.bind(this);
 
-    this.getIsPending = this.getIsPending.bind(this);
-    this.startPending = this.startPending.bind(this);
-    this.endPending = this.endPending.bind(this);
+    this.getTransactionState = this.getTransactionState.bind(this);
+    this.standbyTransaction = this.standbyTransaction.bind(this);
+    this.startTransaction = this.startTransaction.bind(this);
+    this.endTransaction = this.endTransaction.bind(this);
   }
 
   private setModalComponentFiberMap(componentFiber: ModalComponentFiber) {
@@ -80,7 +89,6 @@ class ModalManager<T extends string = string> {
       defaultOptions: {
         ...defaultOptions,
         duration: defaultOptions?.duration || this.modalDuration,
-        backCoverActionType: defaultOptions?.backCoverActionType ?? false,
       },
     };
 
@@ -94,22 +102,34 @@ class ModalManager<T extends string = string> {
 
     const closeModal = getCloseModal({
       id,
-      options,
+      duration: options.duration,
       closeModal: this.remove,
-      getIsPending: this.getIsPending,
-      startPending: this.startPending,
-      endPending: this.endPending,
+      getTransactionState: this.getTransactionState,
+      startTransaction: this.startTransaction,
+      endTransaction: this.endTransaction,
     });
 
-    const appliedModalFiber: ModalFiber<ModalOptions> = {
+    const middleware = options.middleware
+      ? options.middleware
+      : defaultMiddleware;
+
+    const initialState: ModalStateProps = {
+      callback: options.callback,
+      closeDelayDuration: options.closeDelay,
+    };
+
+    const modalStateManager = new ModalStateManager(initialState);
+
+    const appliedModalFiber = {
       ...modalFiber,
       options: {
-        ...modalFiber.options,
+        ...options,
         closeModal,
-        call: this.call,
-        positionState: MODAL_POSITION_STATE.initial,
+        middleware,
+        stateManager: modalStateManager,
+        isPending: false,
       },
-    };
+    } as ModalFiber<ModalOptions>;
 
     return appliedModalFiber;
   }
@@ -118,8 +138,8 @@ class ModalManager<T extends string = string> {
     return this.callCount;
   }
 
-  getIsPending() {
-    return this.isPending;
+  getTransactionState() {
+    return this.transactionState;
   }
 
   getModalFiberStack() {
@@ -171,10 +191,10 @@ class ModalManager<T extends string = string> {
   }
 
   getCurrentModalPosition(
-    positionState: ModalPositionState,
+    positionState: ModalLifecycleState,
     position: string = MODAL_POSITION.center
   ) {
-    let state: ModalPositionState = positionState;
+    let state: ModalLifecycleState = positionState;
     let key: string = position;
 
     const positionKey = getPositionKey(position, state);
@@ -194,14 +214,14 @@ class ModalManager<T extends string = string> {
 
     const { initial, active, final } = this.getModalPosition(key);
 
-    if (state === MODAL_POSITION_STATE.initial) {
+    if (state === MODAL_LIFECYCLE_STATE.initial) {
       return {
         ...defaultInitial,
         ...initial,
       };
     }
 
-    if (state === MODAL_POSITION_STATE.active) {
+    if (state === MODAL_LIFECYCLE_STATE.active) {
       return {
         ...defaultActive,
         ...active,
@@ -273,11 +293,11 @@ class ModalManager<T extends string = string> {
     return this.callCount;
   }
 
-  setIsPending(isPending: boolean) {
-    this.isPending = isPending;
+  setTransactionState(transactionState: ModalTransactionState) {
+    this.transactionState = transactionState;
     this.notify();
 
-    return isPending;
+    return transactionState;
   }
 
   setModalComponent(
@@ -322,18 +342,24 @@ class ModalManager<T extends string = string> {
     this.listeners = this.listeners.filter((l) => l !== listener);
   }
 
-  startPending() {
-    this.setIsPending(true);
+  standbyTransaction() {
+    this.setTransactionState(MODAL_TRANSACTION_STATE.standby);
     this.callCount += 1;
 
     return this.callCount;
   }
 
-  endPending() {
+  startTransaction() {
+    this.setTransactionState(MODAL_TRANSACTION_STATE.active);
+
+    return this.callCount;
+  }
+
+  endTransaction() {
     this.callCount -= 1;
 
     if (this.callCount < 1) {
-      this.setIsPending(false);
+      this.setTransactionState(MODAL_TRANSACTION_STATE.idle);
     }
 
     return this.callCount;
@@ -342,7 +368,7 @@ class ModalManager<T extends string = string> {
   notify() {
     const listenerProps: ModalListenerProps = {
       modalFiberStack: this.modalFiberStack,
-      isPending: this.isPending,
+      transactionState: this.transactionState,
     };
 
     this.listeners.forEach((listener) => listener(listenerProps));
@@ -428,7 +454,7 @@ class ModalManager<T extends string = string> {
       throw new Error("modalManager.ts line 372: not function");
     }
 
-    this.startPending();
+    this.startTransaction();
 
     try {
       const data = await asyncCallback(asyncCallbackProps);
@@ -445,7 +471,7 @@ class ModalManager<T extends string = string> {
 
       throw new Error("modalManager.ts line 383: not error");
     } finally {
-      this.endPending();
+      this.endTransaction();
     }
   }
 
@@ -454,7 +480,10 @@ class ModalManager<T extends string = string> {
    * @param options
    * @returns 현재 등록된 모달의 id를 반환합니다. 만약 등록되지 않은 모달이라면 0을 반환합니다.
    */
-  open(name: string | ModalComponent, options: ModalDispatchOptions = {}) {
+  open<TPayload = any>(
+    name: string | ModalComponent,
+    options: ModalDispatchOptions<TPayload> = {}
+  ) {
     if (typeof name === "string") {
       const componentFiber = this.modalComponentFiberMap.get(name);
 
@@ -466,7 +495,7 @@ class ModalManager<T extends string = string> {
 
       this.currentId += 1;
 
-      const modalFiber: ModalFiber<ModalDispatchOptions> = {
+      const modalFiber: ModalFiber<ModalDispatchOptions<TPayload>> = {
         id: this.currentId,
         name,
         component,

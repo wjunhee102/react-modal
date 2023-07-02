@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import ModalContainer from './components/ModalContainer';
-import { modalController } from './modal';
+import { modalController } from './modal-pre';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

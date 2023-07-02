@@ -15,11 +15,11 @@ const ModalConfirmButton = ({
     return null;
   }
 
-  const { closeModal, confirmContent } = options;
+  const { action, confirmContent } = options;
 
   const onClickConfirm = (e: MouseEvent<HTMLButtonElement>) => {
     onClick && onClick(e);
-    closeModal(true);
+    action(true);
   };
 
   return (

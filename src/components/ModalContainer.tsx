@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ModalCancelButton, ModalConfirmButton, ModalFC, ModalMeta, ModalProvider } from "../modal";
+import { ModalCancelButton, ModalConfirmButton, ModalFC, ModalMeta, ModalProvider } from "../modal-pre";
 
 function delay(time: number) {
   console.log("delay");

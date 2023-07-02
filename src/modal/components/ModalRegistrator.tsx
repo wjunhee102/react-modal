@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import {
-  ModalCallback,
+  ModalComponent,
+  ModalComponentProps,
   ModalDispatchOptions,
-  ModalOptions,
-} from "../entities/types";
+} from "../types";
 import ModalManager from "../services/modalManager";
+import { ModalCallback } from "../services/modalStateManager";
 
 interface ModalRegistratorProps {
   open?: boolean;
@@ -12,7 +13,9 @@ interface ModalRegistratorProps {
   name?: string;
   modalManager?: ModalManager;
   options?: ModalDispatchOptions;
-  children: (options: ModalOptions) => React.ReactElement;
+  children:
+    | ((props: ModalComponentProps) => React.ReactElement)
+    | ModalComponent;
 }
 
 const setModalRegistrator = (defaultModalManager: ModalManager) =>
@@ -24,12 +27,12 @@ const setModalRegistrator = (defaultModalManager: ModalManager) =>
     modalManager = defaultModalManager,
     options = {},
   }: ModalRegistratorProps) {
-    const [modalId, setModalId] = useState<number>(-1);
-    const [currentName, setCurrentName] = useState<string>("");
+    const [modalId, setModalId] = useState(-1);
+    const [currentName, setCurrentName] = useState("");
 
-    const callback: ModalCallback = (actionType) => {
+    const callback: ModalCallback = (confirm, stateController) => {
       setOpen && setOpen(false);
-      options.callback && options.callback(actionType);
+      options.callback && options.callback(confirm, stateController);
     };
 
     const modalOptions = {
@@ -41,6 +44,7 @@ const setModalRegistrator = (defaultModalManager: ModalManager) =>
       modalManager.setModalComponent({
         name,
         component: children,
+        defaultOptions: modalOptions,
       });
     }
 

@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { ModalOptions } from "../entities/types";
+import { ModalComponentProps } from "../types";
 
-const ModalContext = createContext<ModalOptions | null>(null);
+const ModalContext = createContext<ModalComponentProps | null>(null);
 
 export default ModalContext;

@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import ModalManager from "../services/modalManager";
-import { ModalListener } from "../entities/types";
+import { ModalListener } from "../types";
 
 function setUseIsOpenModal(defaultModalManager: ModalManager) {
   return (modalManager: ModalManager = defaultModalManager) => {
-    const [isOpenModal, setIsOpen] = useState(false);
+    const [isOpenModal, setIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
-      const listener: ModalListener = ({
-        modalFiberStack,
-      }) => {
+      const listener: ModalListener = ({ modalFiberStack }) => {
         setIsOpen(modalFiberStack.length > 0);
       };
 

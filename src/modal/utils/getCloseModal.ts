@@ -1,77 +1,67 @@
-import {
-  CloseModal,
-  ModalCallback,
-  ModalDispatchOptions,
-} from "../entities/types";
+import { MODAL_TRANSACTION_STATE } from "../contants/constants";
+import { CloseModal, ModalClose, ModalTransactionState } from "../types";
 
-function setDuration(duration: number) {
-  const appliedDuration = duration;
+function setDuration(rawDuration: number) {
+  const duration = rawDuration;
 
-  return appliedDuration < 0 ? 0 : appliedDuration;
+  return duration < 0 ? 0 : duration;
 }
 
 interface GetCloseModalProps {
   id: number;
-  options: ModalDispatchOptions;
+  duration?: number;
   closeModal: CloseModal;
-  getIsPending: () => boolean;
-  startPending: () => void;
-  endPending: () => void;
+  getTransactionState: () => ModalTransactionState;
+  startTransaction: () => void;
+  endTransaction: () => void;
 }
 
 export function getCloseModal({
   id,
-  options,
+  duration: rawDuration,
   closeModal,
-  getIsPending,
-  startPending,
-  endPending,
-}: GetCloseModalProps): ModalCallback {
-  const { duration, callback } = options;
-
-  const close: ModalCallback = (actionType) => {
-    startPending();
-
-    const removedName = callback && callback(actionType);
-
-    if (!removedName) {
-      closeModal(id);
-      endPending();
-
-      return;
-    }
-
-    closeModal([id, removedName]);
-    endPending();
+  getTransactionState,
+  startTransaction,
+  endTransaction,
+}: GetCloseModalProps): ModalClose {
+  const close: ModalClose = async (callback, confirm) => {
+    callback && (await callback(confirm));
+    closeModal(id);
+    endTransaction();
   };
 
-  if (duration === undefined) {
-    return (actionType) => {
-      const isPending = getIsPending();
+  if (rawDuration === undefined) {
+    return async (callback, confirm) => {
+      const transactionState = getTransactionState();
 
-      if (isPending) {
+      if (transactionState === MODAL_TRANSACTION_STATE.active) {
         return;
       }
 
-      close(actionType);
+      startTransaction();
+
+      close(callback, confirm);
     };
   }
 
-  const appliedDuration = setDuration(duration);
+  const duration = setDuration(rawDuration);
 
-  return (actionType) => {
-    const isPending = getIsPending();
-    if (isPending) {
+  return async (callback, confirm) => {
+    const transactionState = getTransactionState();
+
+    if (transactionState === MODAL_TRANSACTION_STATE.active) {
       return;
     }
 
+    startTransaction();
+
     if (setTimeout === undefined) {
-      close(actionType);
+      close(callback, confirm);
       return;
     }
 
     setTimeout(() => {
-      close(actionType);
-    }, appliedDuration);
+      close(callback, confirm);
+    }, duration);
   };
 }

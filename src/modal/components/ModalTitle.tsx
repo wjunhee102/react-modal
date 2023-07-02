@@ -1,9 +1,11 @@
-import { HTMLAttributes } from "react";
+import { ElementType, HTMLAttributes } from "react";
 import useModalOptions from "../hooks/useModalOptions";
 
-interface ModalTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
+interface ModalTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+  as?: ElementType;
+}
 
-const ModalTitle = ({ children, ...restProps }: ModalTitleProps) => {
+const ModalTitle = ({ as, children, ...restProps }: ModalTitleProps) => {
   const options = useModalOptions();
 
   if (!options) {
@@ -12,7 +14,13 @@ const ModalTitle = ({ children, ...restProps }: ModalTitleProps) => {
 
   const { title } = options;
 
-  return <h2 {...restProps}>{title || children}</h2>;
+  if (!title && !children) {
+    return null;
+  }
+
+  const Component = as || "h2";
+
+  return <Component {...restProps}>{title || children}</Component>;
 };
 
 export default ModalTitle;

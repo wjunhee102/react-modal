@@ -1,9 +1,11 @@
-import { HTMLAttributes } from "react";
+import { ElementType, HTMLAttributes } from "react";
 import useModalOptions from "../hooks/useModalOptions";
 
-interface ModalContentProps extends HTMLAttributes<HTMLDivElement> {}
+interface ModalContentProps extends HTMLAttributes<HTMLDivElement> {
+  as?: ElementType;
+}
 
-const ModalContent = ({ children, ...restProps }: ModalContentProps) => {
+const ModalContent = ({ as, children, ...restProps }: ModalContentProps) => {
   const options = useModalOptions();
 
   if (!options) {
@@ -12,7 +14,13 @@ const ModalContent = ({ children, ...restProps }: ModalContentProps) => {
 
   const { content } = options;
 
-  return <div {...restProps}>{content || children}</div>;
+  if (!content && !children) {
+    return null;
+  }
+
+  const Component = as || "div";
+
+  return <Component {...restProps}>{content || children}</Component>;
 };
 
 export default ModalContent;

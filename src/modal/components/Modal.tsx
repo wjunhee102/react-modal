@@ -2,49 +2,81 @@ import React, { useEffect, useMemo, useState } from "react";
 import ModalManager from "../services/modalManager";
 import ModalContext from "../services/modalContext";
 import {
-  ModalActionType,
+  ModalComponentProps,
   ModalFiber,
-  ModalOptions,
-  ModalPositionState,
-} from "../entities/types";
-import { MODAL_POSITION, MODAL_POSITION_STATE } from "../contants/constants";
+  ModalTransactionState,
+} from "../types";
+import { MODAL_POSITION, MODAL_TRANSACTION_STATE } from "../contants/constants";
 import { delay } from "../utils/delay";
+import {
+  MODAL_LIFECYCLE_STATE,
+  ModalCallback,
+  ModalConfirmType,
+  ModalState,
+  StateController,
+} from "../services/modalStateManager";
 
 interface ModalProps extends ModalFiber {
   modalManager: ModalManager;
   breakPoint: number;
-  isPending: boolean;
+  transactionState: ModalTransactionState;
 }
 
 const Modal = ({
   modalManager,
   breakPoint,
-  isPending,
+  transactionState,
   options,
   component: Component,
 }: ModalProps) => {
-  const [positionState, setPositionState] = useState<ModalPositionState>(
-    MODAL_POSITION_STATE.initial
+  const { isClose, backCoverConfirm, stateManager } = options;
+
+  const [state, setState] = useState(stateManager.getState());
+
+  const { lifecycleState } = state;
+
+  const isActive = lifecycleState === MODAL_LIFECYCLE_STATE.active;
+
+  const stateController: StateController = useMemo(
+    () => stateManager.getController(),
+    [stateManager]
   );
 
-  const { isClose, backCoverActionType } = options;
+  const modalProps: ModalComponentProps = useMemo(() => {
+    const { middleware } = options;
 
-  const isActive = positionState === MODAL_POSITION_STATE.active;
-
-  const modalOptions: ModalOptions = useMemo(
-    () => ({
+    const appliedOptions = {
       ...options,
-      closeModal: (actionType?: ModalActionType) => {
-        if (isPending) {
+      callback: undefined,
+      closeModal: undefined,
+      middleware: undefined,
+    };
+
+    const props = {
+      ...appliedOptions,
+      ...state,
+      transactionState,
+      stateController,
+      action: (confirm?: ModalConfirmType, actionCallback?: ModalCallback) => {
+        if (transactionState !== MODAL_TRANSACTION_STATE.idle) {
           return;
         }
-        setPositionState(MODAL_POSITION_STATE.final);
-        options.closeModal(actionType);
+
+        stateManager.setConfirm(confirm).setCallback(actionCallback);
+
+        middleware({
+          transactionState,
+          standbyTransaction: modalManager.standbyTransaction,
+          startTransaction: modalManager.startTransaction,
+          endTransaction: modalManager.endTransaction,
+          stateController,
+        });
       },
-      positionState,
-    }),
-    [options, isPending, positionState]
-  );
+    };
+
+    return props;
+    // eslint-disable-next-line
+  }, [options, transactionState, state]);
 
   const {
     modalStyle,
@@ -58,25 +90,25 @@ const Modal = ({
       backCoverOpacity,
       duration,
       transitionOptions,
-      position,
+      position: rawPosition,
     } = options;
 
-    const appliedPosition =
-      typeof position === "function" ? position(breakPoint) : position;
+    const position =
+      typeof rawPosition === "function" ? rawPosition(breakPoint) : rawPosition;
 
     const backCoverPosition = modalManager.getCurrentModalPosition(
-      positionState,
+      lifecycleState,
       MODAL_POSITION.backCover
     );
     const modalPosition = modalManager.getCurrentModalPosition(
-      positionState,
-      appliedPosition
+      lifecycleState,
+      position
     );
     const transition = modalManager.getModalTrainsition(
       duration,
       transitionOptions
     );
-    const isActiveState = positionState === MODAL_POSITION_STATE.active;
+    const isActiveState = lifecycleState === MODAL_LIFECYCLE_STATE.active;
 
     return {
       modalStyle: {
@@ -85,7 +117,10 @@ const Modal = ({
         ...modalPosition,
       },
       backCoverStyle: {
-        cursor: isActiveState ? "pointer" : "default",
+        cursor:
+          isActiveState && options.backCoverConfirm !== null
+            ? "pointer"
+            : "default",
         ...transition,
         ...backCoverPosition,
         background:
@@ -94,24 +129,42 @@ const Modal = ({
           (isActiveState && backCoverOpacity) || backCoverPosition.opacity,
       },
     };
-  }, [options, modalManager, breakPoint, positionState]);
+  }, [options, modalManager, breakPoint, lifecycleState]);
 
   const onCloseModal = () => {
-    if (isPending || modalManager.getIsPending()) {
+    if (
+      transactionState !== MODAL_TRANSACTION_STATE.idle ||
+      backCoverConfirm === null
+    ) {
       return;
     }
-    modalOptions.closeModal(backCoverActionType);
+
+    modalProps.action(backCoverConfirm);
   };
+
+  useEffect(() => {
+    const listener = (modalState: ModalState) => {
+      setState(modalState);
+    };
+
+    stateManager.subscribe(listener);
+
+    return () => {
+      stateManager.unSubscribe(listener);
+    };
+  }, [stateManager]);
 
   useEffect(() => {
     let asyncOpenModal: NodeJS.Timeout | null = null;
 
     if (setTimeout) {
       asyncOpenModal = setTimeout(() => {
-        setPositionState(MODAL_POSITION_STATE.active);
+        stateManager.lifecycleState = MODAL_LIFECYCLE_STATE.active;
+        stateManager.notify();
       }, 10);
     } else {
-      setPositionState(MODAL_POSITION_STATE.active);
+      stateManager.lifecycleState = MODAL_LIFECYCLE_STATE.active;
+      stateManager.notify();
     }
 
     return () => {
@@ -123,22 +176,28 @@ const Modal = ({
   }, []);
 
   useEffect(() => {
-    if (positionState === MODAL_POSITION_STATE.active) {
+    if (lifecycleState === MODAL_LIFECYCLE_STATE.active) {
       return;
     }
 
-    const { duration, call } = options;
+    if (lifecycleState === MODAL_LIFECYCLE_STATE.final) {
+      options.closeModal(stateManager.endCallback, stateManager.confirm);
+    }
 
-    call(delay, duration ?? 0);
-    // eslint-disable-next-line
-  }, [positionState]);
+    if (lifecycleState === MODAL_LIFECYCLE_STATE.initial) {
+      const { duration } = options;
 
-  useEffect(() => {
-    if (!isPending && isClose) {
-      modalOptions.closeModal();
+      modalManager.call(delay, duration ?? 0);
     }
     // eslint-disable-next-line
-  }, [isClose, isPending]);
+  }, [lifecycleState]);
+
+  useEffect(() => {
+    if (transactionState === "idle" && isClose) {
+      modalProps.action(backCoverConfirm);
+    }
+    // eslint-disable-next-line
+  }, [isClose, transactionState]);
 
   return (
     <div className="modalWrapper-r">
@@ -152,8 +211,8 @@ const Modal = ({
       </button>
       <div className="modalContentContainer-r">
         <div className="modalContent-r" style={modalStyle}>
-          <ModalContext.Provider value={modalOptions}>
-            <Component {...modalOptions} />
+          <ModalContext.Provider value={modalProps}>
+            <Component {...modalProps} />
           </ModalContext.Provider>
         </div>
       </div>

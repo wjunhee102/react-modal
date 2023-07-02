@@ -1,24 +1,33 @@
-import { DEFAULT_POSITION, MODAL_POSITION_STATE, MODAL_POSITION_STATE_LIST } from "../contants/constants";
-import { ModalPositionState } from "../entities/types";
+import { DEFAULT_POSITION } from "../contants/constants";
+import {
+  MODAL_LIFECYCLE_STATE,
+  MODAL_LIFECYCLE_STATE_LIST,
+  ModalLifecycleState,
+} from "../services/modalStateManager";
 
 const POSITION_STATE_VALUE = {
-  [MODAL_POSITION_STATE.initial]: 0,
-  [MODAL_POSITION_STATE.active]: 1,
-  [MODAL_POSITION_STATE.final]: 2,
-}
+  [MODAL_LIFECYCLE_STATE.initial]: 0,
+  [MODAL_LIFECYCLE_STATE.active]: 1,
+  [MODAL_LIFECYCLE_STATE.final]: 2,
+};
 
-export function getPositionKeyByState(positionList: string[]): string | [ModalPositionState, string] {
+export function getPositionKeyByState(
+  positionList: string[]
+): string | [ModalLifecycleState, string] {
   if (
-    positionList.length < 1 || 
-    !MODAL_POSITION_STATE_LIST.includes(positionList[0])
+    positionList.length < 1 ||
+    !MODAL_LIFECYCLE_STATE_LIST.includes(positionList[0])
   ) {
     return positionList[0] ?? DEFAULT_POSITION.center;
   }
 
-  return positionList as [ModalPositionState, string];
+  return positionList as [ModalLifecycleState, string];
 }
 
-export function getPositionKey(position: string, positionState: ModalPositionState): string | [ModalPositionState, string] {
+export function getPositionKey(
+  position: string,
+  positionState: ModalLifecycleState
+): string | [ModalLifecycleState, string] {
   const positionList = position.split("-");
 
   if (positionList.length < 3) {

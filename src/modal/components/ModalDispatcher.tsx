@@ -5,9 +5,11 @@ import {
   ModalFiber,
   ModalListener,
   ModalManagerOptionsProps,
-} from "../entities/types";
+  ModalTransactionState,
+} from "../types";
 import disableBodyScroll from "../utils/disableBodyScroll";
 import Modal from "./Modal";
+import { MODAL_TRANSACTION_STATE } from "../contants/constants";
 
 import "./modal.css";
 
@@ -28,13 +30,14 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
     const [modalFiberList, setModalFiberList] = useState<ModalFiber[]>([]);
     const [breakPoint, setBreakPoint] = useState(window?.innerWidth ?? 0);
     const [isOpen, setIsOpen] = useState(false);
-    const [isPending, setIsPending] = useState(false);
+    const [transactionState, setTransactionState] =
+      useState<ModalTransactionState>(MODAL_TRANSACTION_STATE.idle);
 
     const onClearModal = () => {
       if (
-        isOpen && 
+        isOpen &&
         modalFiberList.length > 0 &&
-        !isPending
+        transactionState === MODAL_TRANSACTION_STATE.idle
       ) {
         modalManager.popModalFiber("clear");
       }
@@ -43,10 +46,10 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
     useEffect(() => {
       const listener: ModalListener = ({
         modalFiberStack,
-        isPending: pending,
+        transactionState: state,
       }) => {
         setModalFiberList(modalFiberStack);
-        setIsPending(pending);
+        setTransactionState(state);
       };
 
       if (modalMeta) {
@@ -93,6 +96,9 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
     useEffect(() => {
       const listener = () => {
         setBreakPoint(window.innerWidth);
+        // 주소 표시줄이 보이거나 숨겨질 때 뷰포트 높이 조정
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty("--vh", `${vh}px`);
       };
 
       window.addEventListener("resize", listener);
@@ -113,12 +119,12 @@ function setModalDispatcher(defaultModalManager: ModalManager) {
           {" "}
         </button>
         {modalFiberList.map((modalFiber) => (
-          <Modal 
-            key={modalFiber.id} 
-            breakPoint={breakPoint} 
+          <Modal
+            key={modalFiber.id}
+            breakPoint={breakPoint}
             modalManager={modalManager}
-            isPending={isPending}
-            {...modalFiber} 
+            transactionState={transactionState}
+            {...modalFiber}
           />
         ))}
       </div>

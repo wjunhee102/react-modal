@@ -15,11 +15,11 @@ const ModalCancelButton = ({
     return null;
   }
 
-  const { closeModal, cancelContent } = options;
+  const { action, cancelContent } = options;
 
   const onClickCancel = (e: MouseEvent<HTMLButtonElement>) => {
     onClick && onClick(e);
-    closeModal(false);
+    action(false);
   };
 
   return (

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Modal, defaultModalManager, openModal } from './modal';
+import { Modal, defaultModalManager, openModal } from './modal-pre';
 import { api } from './api';
 
 defaultModalManager.setModalComponent({
@@ -15,6 +15,93 @@ defaultModalManager.setModalComponent({
   }
 });
 
+// const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+// const GeneratorFunctio = Object.getPrototypeOf(function*(){}).constructor;
+
+
+// const normalFunction = function() {};
+// const asyncFunction = async function() {};
+// const generatorFunction = function*() {};
+
+// console.log(normalFunction.constructor === Function); // true
+// console.log(asyncFunction.constructor === AsyncFunction); // true
+// console.log(generatorFunction.constructor === GeneratorFunctio); // true
+// console.log(normalFunction.constructor, asyncFunction.constructor, generatorFunction, AsyncFunction, GeneratorFunctio);
+
+function delay(time: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+} 
+
+async function newApi() {
+  const result: any = await delay(400);
+
+  return result;
+}
+
+function aaa() {
+  return newApi();
+}
+
+function* call(): Generator {
+  let data = yield aaa();
+  console.log("data1", data);
+  data = yield aaa();
+  console.log("data2", data);
+  return data;
+}
+
+
+
+async function callback() {
+  const generator = call();
+  
+  const data = await generator.next().value;
+
+  console.log(data);
+  generator.next("success");
+  generator.next("fail");
+
+  return data;
+}
+
+callback();
+
+function* myGenerator(): Generator<number | undefined, void, number> {
+  let input = yield;
+
+  while (true) {
+    if (input === undefined) {
+      return input;
+    }
+
+      input = yield input * input;
+  }
+}
+
+const generator = myGenerator();
+
+console.log(generator.next(1)); // { value: undefined, done: false }
+console.log(generator.next(2)); // { value: 4, done: false }
+console.log(generator.next(3)); // { value: 9, done: false }
+
+interface ComponentProps {
+  children: ReactNode;
+}
+
+function Component({ children }: ComponentProps) {
+  return (
+    <div>
+      {Array.isArray(children) ? (
+        <div> {children[0]} <h1>{children[1]}</h1> </div>
+      ) : children }
+    </div>
+  );
+}
+
 function App() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpen2, setIsOpen2] = useState(false);
@@ -26,6 +113,14 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
+        <Component>
+          {
+            [
+              <div>dsadsd1</div>,
+              <div>dsadsd2</div>,
+            ]
+          }
+        </Component>
         <a
           className="App-link"
           href="https://reactjs.org"
@@ -38,13 +133,13 @@ function App() {
           onClick={
             () => openModal("modal1", 
             { 
-              callback: (actionType) => {
-                if (actionType === true) {
+              callback: (confirm) => {
+                if (confirm === true) {
                   openModal("modal2", { 
                     duration: 1000, 
                     position: "rightBottom-center-leftBottom" 
                   });
-                } else if (actionType === false) {
+                } else if (confirm === false) {
                   openModal("modal2", { 
                     duration: 1000, 
                     position: "leftBottom-center-rightBottom" 
@@ -61,7 +156,7 @@ function App() {
               "modal2", { 
                 content: "모달 2", 
                 position: "rightCenterLeft", 
-                duration: 500,
+                duration: 300,
                 callback: () => {
                   openModal("modal2", {
                     content: "모달 3", 
@@ -80,7 +175,6 @@ function App() {
         <button 
           onClick={() => openModal(
             (props) => (<div className="w-[300px] h-[100px] bg-white shadow-sm shadow-slate-50">안녕하세요 반갑습니다.</div>), {
-              duration: 5000, 
               backCoverOpacity: 0.3,
               backCoverColor: "#f0f"
             }
